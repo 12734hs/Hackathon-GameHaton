@@ -17,6 +17,15 @@ function navigateTo(screenId) {
       targetScreen.classList.add("active");
       window.scrollTo(0, 0);
       console.log(`✓ Navigated to: ${screenId}`);
+
+      if (screenId === "dashboard") {
+        renderJoinedTeams();
+      }
+
+      if (screenId === "chat") {
+        const activeTeam = getActiveTeam();
+        renderChatTeam(activeTeam?.name || "");
+      }
     } else {
       console.error(`✗ Screen with ID "${screenId}" not found`);
     }
@@ -73,6 +82,223 @@ function toggleDashboardSidebar() {
 
   sidebar.classList.toggle("open");
   updateResponsiveState();
+}
+
+const teamDirectory = {
+  "Counter-Strike 2": [
+    { name: "ProArtist", status: "Online", initials: "PA" },
+    { name: "NeonKing", status: "Online", initials: "NK" },
+    { name: "SkyGamer", status: "Away", initials: "SG" },
+    { name: "FXMaster", status: "Online", initials: "FX" },
+  ],
+  "Valorant Squad": [
+    { name: "Valkyrie", status: "Online", initials: "VK" },
+    { name: "ApexBlitz", status: "Busy", initials: "AB" },
+    { name: "RushLine", status: "Online", initials: "RL" },
+    { name: "Cipher", status: "Away", initials: "CP" },
+  ],
+  "Dota 2 Tournament": [
+    { name: "MidLord", status: "Online", initials: "ML" },
+    { name: "CarryFox", status: "Online", initials: "CF" },
+    { name: "WardKing", status: "Away", initials: "WK" },
+    { name: "Stacker", status: "Online", initials: "ST" },
+  ],
+};
+
+function getJoinedTeams() {
+  try {
+    return JSON.parse(localStorage.getItem("joinedTeams") || "[]");
+  } catch (error) {
+    return [];
+  }
+}
+
+function setJoinedTeams(teams) {
+  localStorage.setItem("joinedTeams", JSON.stringify(teams));
+}
+
+function getActiveTeam() {
+  try {
+    return JSON.parse(localStorage.getItem("activeTeam") || "null");
+  } catch (error) {
+    return null;
+  }
+}
+
+function setActiveTeam(team) {
+  localStorage.setItem("activeTeam", JSON.stringify(team));
+}
+
+function renderJoinedTeams() {
+  const list = document.getElementById("joinedTeamsList");
+  const count = document.getElementById("joinedTeamsCount");
+  if (!list) {
+    return;
+  }
+
+  const joinedTeams = getJoinedTeams();
+  const activeTeam = getActiveTeam();
+
+  if (count) {
+    count.textContent = String(joinedTeams.length);
+  }
+
+  if (!joinedTeams.length) {
+    list.innerHTML = "";
+    return;
+  }
+
+  list.innerHTML = joinedTeams
+    .map((teamName) => {
+      const isActive = activeTeam?.name === teamName;
+      return `
+        <button class="joined-team-chip ${isActive ? "active" : ""}" type="button" onclick="openTeamChat('${teamName.replace(/'/g, "\\'")}')">
+          <i class="fas fa-users"></i>
+          <span>${teamName}</span>
+        </button>
+      `;
+    })
+    .join("");
+}
+
+function removeJoinedGameCards() {
+  const joinedTeams = getJoinedTeams();
+  const cards = document.querySelectorAll(".game-card");
+
+  cards.forEach((card) => {
+    const title = card.querySelector(".game-title")?.textContent?.trim();
+    if (title && joinedTeams.includes(title)) {
+      card.remove();
+    }
+  });
+}
+
+function toggleJoinedTeamsDropdown() {
+  const list = document.getElementById("joinedTeamsList");
+  const chevron = document.getElementById("joinedTeamsChevron");
+
+  if (!list) {
+    return;
+  }
+
+  const isOpen = list.classList.toggle("is-open");
+  if (chevron) {
+    chevron.style.transform = isOpen ? "rotate(0deg)" : "rotate(-90deg)";
+  }
+}
+
+function renderChatTeam(teamName) {
+  const team = teamDirectory[teamName] || [];
+  const chatTeamTitle = document.getElementById("chatTeamTitle");
+  const chatTeamSubtitle = document.getElementById("chatTeamSubtitle");
+  const chatSidebarTeam = document.getElementById("chatSidebarTeam");
+  const chatMembersList = document.getElementById("chatMembersList");
+  const chatMessages = document.getElementById("chatMessages");
+
+  if (chatTeamTitle) {
+    chatTeamTitle.textContent = teamName || "Team Chat";
+  }
+
+  if (chatTeamSubtitle) {
+    chatTeamSubtitle.textContent = team.length
+      ? `${team.length} attending players`
+      : "Choose a team from Joined Teams";
+  }
+
+  if (chatSidebarTeam) {
+    chatSidebarTeam.textContent = teamName || "Select a team from the dashboard";
+  }
+
+  if (chatMembersList) {
+    if (!team.length) {
+      chatMembersList.innerHTML = `
+        <div class="user-item active">
+          <div class="user-avatar">--</div>
+          <div class="user-info">
+            <span class="user-name">No team selected</span>
+            <span class="user-status">Join a team from Main</span>
+          </div>
+        </div>
+      `;
+    } else {
+      chatMembersList.innerHTML = team
+        .map(
+          (member, index) => `
+            <div class="user-item ${index === 0 ? "active" : ""}">
+              <div class="user-avatar">${member.initials}</div>
+              <div class="user-info">
+                <span class="user-name">${member.name}</span>
+                <span class="user-status">${member.status}</span>
+              </div>
+            </div>
+          `,
+        )
+        .join("");
+    }
+  }
+
+  if (chatMessages) {
+    chatMessages.innerHTML = teamName
+      ? `
+        <div class="message-group">
+          <div class="message message-other">
+            <span class="message-sender">${teamName}</span>
+            <p>Team room opened. Say hi to your squad.</p>
+            <span class="message-time">Now</span>
+          </div>
+        </div>
+      `
+      : `
+        <div class="message-group">
+          <div class="message message-other">
+            <span class="message-sender">Team Chat</span>
+            <p>Select a team from the dashboard to start chatting.</p>
+            <span class="message-time">Now</span>
+          </div>
+        </div>
+      `;
+  }
+}
+
+function joinTeam(teamName, buttonElement) {
+  const joinedTeams = getJoinedTeams();
+  if (!joinedTeams.includes(teamName)) {
+    joinedTeams.push(teamName);
+    setJoinedTeams(joinedTeams);
+  }
+
+  setActiveTeam({ name: teamName });
+  renderJoinedTeams();
+  removeJoinedGameCards();
+  if (buttonElement) {
+    const card = buttonElement.closest(".game-card");
+    if (card) {
+      card.remove();
+    }
+  }
+  showNotification(`${teamName} added to Joined Teams`);
+}
+
+function syncGameCardButtons() {
+  const teamButtons = document.querySelectorAll(".team-join-btn[data-team]");
+
+  teamButtons.forEach((button) => {
+    const teamName = button.getAttribute("data-team");
+    button.textContent = "Join Team";
+    button.classList.remove("btn-primary");
+    button.classList.add("btn-outline");
+    button.setAttribute(
+      "onclick",
+      `joinTeam('${teamName.replace(/'/g, "\\'")}', this)`,
+    );
+  });
+}
+
+function openTeamChat(teamName) {
+  setActiveTeam({ name: teamName });
+  renderJoinedTeams();
+  navigateTo("chat");
+  renderChatTeam(teamName);
 }
 
 // Modal Management
@@ -217,7 +443,7 @@ async function handleSignup(event) {
     }
 
     if (age < 13) {
-      showNotification("You must be at least 13 years old to join GameHaton!");
+      showNotification("You must be at least 13 years old to join LetsPlay!");
       return;
     }
 
@@ -248,7 +474,7 @@ async function handleSignup(event) {
     );
 
     // Show success and navigate
-    showNotification("🎮 Account created successfully! Welcome to GameHaton!");
+    showNotification("🎮 Account created successfully! Welcome to LetsPlay!");
 
     // Clear form
     event.target.reset();
@@ -448,7 +674,11 @@ document.head.appendChild(style);
 // Sidebar Navigation Active States
 document.addEventListener("DOMContentLoaded", () => {
   updateResponsiveState();
+  renderJoinedTeams();
+  removeJoinedGameCards();
+  syncGameCardButtons();
 
+    removeJoinedGameCards();
   responsiveQueries.mobile.addEventListener("change", updateResponsiveState);
   responsiveQueries.touch.addEventListener("change", updateResponsiveState);
 
@@ -703,7 +933,7 @@ window.addEventListener("load", () => {
 
 // Log system info on page load
 window.addEventListener("load", () => {
-  console.log("🎮 GameHaton Platform Initialized");
+  console.log("🎮 LetsPlay Platform Initialized");
   console.log("================================");
 
   // Check if all screens exist
@@ -769,6 +999,8 @@ window.GameHatonApp = {
   openCreateGameModal,
   closeCreateGameModal,
   toggleDashboardSidebar,
+  joinTeam,
+  openTeamChat,
   showNotification,
   handleLogin,
   handleSignup,

@@ -329,19 +329,21 @@
               <i class="fas fa-home"></i>
               <span>Main</span>
             </a>
-            <a href="#" class="nav-item" data-section="activities">
-              <i class="fas fa-gamepad"></i>
-              <span>Activities</span>
-            </a>
-            <a href="#" class="nav-item" data-section="finished">
-              <i class="fas fa-check-circle"></i>
-              <span>Finished</span>
-            </a>
-            <a href="#" class="nav-item" data-section="pending">
-              <i class="fas fa-hourglass-half"></i>
-              <span>Pending</span>
-            </a>
           </nav>
+
+          <section class="sidebar-teams" id="joinedTeamsPanel">
+            <button
+              class="sidebar-teams-toggle"
+              type="button"
+              onclick="toggleJoinedTeamsDropdown()"
+            >
+              <span class="sidebar-teams-title">Joined Teams</span>
+              <span class="sidebar-teams-count" id="joinedTeamsCount">0</span>
+              <i class="fas fa-chevron-down" id="joinedTeamsChevron"></i>
+            </button>
+            <div class="sidebar-teams-list" id="joinedTeamsList">
+            </div>
+          </section>
           <div class="sidebar-footer">
             <button class="btn btn-small" onclick="navigateTo('profile')">
               <i class="fas fa-user"></i> Profile
@@ -398,12 +400,12 @@
               </p>
               <div class="game-card-footer">
                 <button
-                  class="btn btn-sm btn-primary"
-                  onclick="navigateTo('chat')"
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Counter-Strike 2"
+                  onclick="joinTeam('Counter-Strike 2', this)"
                 >
-                  View Details
+                  Join Team
                 </button>
-                <button class="btn btn-sm btn-outline">Join Team</button>
               </div>
             </div>
 
@@ -430,12 +432,12 @@
               </p>
               <div class="game-card-footer">
                 <button
-                  class="btn btn-sm btn-primary"
-                  onclick="navigateTo('chat')"
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Valorant Squad"
+                  onclick="joinTeam('Valorant Squad', this)"
                 >
-                  View Details
+                  Join Team
                 </button>
-                <button class="btn btn-sm btn-outline">Join Team</button>
               </div>
             </div>
 
@@ -462,12 +464,12 @@
               </p>
               <div class="game-card-footer">
                 <button
-                  class="btn btn-sm btn-primary"
-                  onclick="navigateTo('chat')"
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Dota 2 Tournament"
+                  onclick="joinTeam('Dota 2 Tournament', this)"
                 >
-                  View Details
+                  Join Team
                 </button>
-                <button class="btn btn-sm btn-outline">Join Team</button>
               </div>
             </div>
           </div>
@@ -551,36 +553,15 @@
         <!-- Users List -->
         <aside class="chat-sidebar">
           <div class="chat-sidebar-header">
-            <h3>Team Members</h3>
-            <input type="text" class="chat-search" placeholder="Search..." />
+            <h3>Attending Players</h3>
+            <p class="chat-sidebar-team" id="chatSidebarTeam">Select a team from the dashboard</p>
           </div>
-          <div class="users-list">
+          <div class="users-list" id="chatMembersList">
             <div class="user-item active">
-              <div class="user-avatar">PA</div>
+              <div class="user-avatar">--</div>
               <div class="user-info">
-                <span class="user-name">ProArtist</span>
-                <span class="user-status">Online</span>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar">NK</div>
-              <div class="user-info">
-                <span class="user-name">NeonKing</span>
-                <span class="user-status">Online</span>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar">SG</div>
-              <div class="user-info">
-                <span class="user-name">SkyGamer</span>
-                <span class="user-status">Away</span>
-              </div>
-            </div>
-            <div class="user-item">
-              <div class="user-avatar">FX</div>
-              <div class="user-info">
-                <span class="user-name">FXMaster</span>
-                <span class="user-status">Online</span>
+                <span class="user-name">No team selected</span>
+                <span class="user-status">Join a team from Main</span>
               </div>
             </div>
           </div>
@@ -590,8 +571,8 @@
         <main class="chat-main">
           <div class="chat-header">
             <div>
-              <h2>Counter-Strike 2 Team</h2>
-              <p class="chat-subtitle">5 members online</p>
+              <h2 id="chatTeamTitle">Team Chat</h2>
+              <p class="chat-subtitle" id="chatTeamSubtitle">Choose a team from Joined Teams</p>
             </div>
             <button
               class="btn btn-sm btn-outline"
@@ -602,46 +583,28 @@
           </div>
 
           <!-- Messages -->
-          <div class="chat-messages">
+          <div class="chat-messages" id="chatMessages">
             <div class="message-group">
               <div class="message message-other">
-                <span class="message-sender">ProArtist</span>
-                <p>Hey team! Ready for the match tonight?</p>
-                <span class="message-time">10:30 AM</span>
-              </div>
-            </div>
-            <div class="message-group">
-              <div class="message message-own">
-                <p>Absolutely! Let's warm up first</p>
-                <span class="message-time">10:31 AM</span>
-              </div>
-            </div>
-            <div class="message-group">
-              <div class="message message-other">
-                <span class="message-sender">NeonKing</span>
-                <p>I'll be on in 5 minutes</p>
-                <span class="message-time">10:32 AM</span>
-              </div>
-            </div>
-            <div class="message-group">
-              <div class="message message-other">
-                <span class="message-sender">SkyGamer</span>
-                <p>Don't start without me!</p>
-                <span class="message-time">10:33 AM</span>
+                <span class="message-sender">Team Chat</span>
+                <p>Select a team from the dashboard to start chatting.</p>
+                <span class="message-time">Now</span>
               </div>
             </div>
           </div>
 
           <!-- Message Input -->
           <div class="chat-input-area">
-            <input
-              type="text"
-              class="chat-input"
-              placeholder="Type your message..."
-            />
-            <button class="btn btn-sm btn-neon">
-              <i class="fas fa-paper-plane"></i>
-            </button>
+            <div class="chat-compose">
+              <input
+                type="text"
+                class="chat-input"
+                placeholder="Type your message..."
+              />
+              <button class="btn btn-sm btn-neon chat-send-btn">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
           </div>
         </main>
 

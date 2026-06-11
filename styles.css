@@ -628,6 +628,138 @@ a:hover {
   margin: 0;
 }
 
+.joined-teams-panel {
+  background: var(--bg-secondary);
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.sidebar-teams {
+  margin: var(--spacing-md) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.sidebar-teams-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  border-left: 3px solid var(--neon-blue);
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+}
+
+.sidebar-teams-toggle:hover {
+  background: rgba(0, 212, 255, 0.12);
+  color: var(--neon-blue);
+}
+
+.sidebar-teams-title {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 600;
+}
+
+.sidebar-teams-count {
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 0.65rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--neon-blue), var(--neon-pink));
+  color: var(--bg-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+#joinedTeamsChevron {
+  color: var(--text-secondary);
+  transition: transform 0.2s ease;
+}
+
+.sidebar-teams-list {
+  display: none;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-left: 0.25rem;
+}
+
+.sidebar-teams-list.is-open {
+  display: flex;
+}
+
+.sidebar-teams-list .joined-team-chip {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: var(--radius-md);
+}
+
+.sidebar-teams-list .joined-teams-empty {
+  padding: 0.35rem 0.25rem 0;
+}
+
+.joined-teams-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.joined-teams-header h3 {
+  margin: 0;
+}
+
+.joined-teams-header p,
+.joined-teams-empty,
+.chat-sidebar-team {
+  margin: 0;
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+.joined-teams-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.joined-team-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  background: rgba(0, 212, 255, 0.08);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.joined-team-chip:hover {
+  border-color: var(--neon-blue);
+  transform: translateY(-1px);
+}
+
+.joined-team-chip.active {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(255, 0, 128, 0.2));
+  border-color: var(--neon-blue);
+}
+
 .games-feed {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -854,16 +986,6 @@ a:hover {
   font-size: 1.2rem;
 }
 
-.chat-search {
-  width: 100%;
-  background: var(--bg-tertiary);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
-}
-
 .users-list {
   display: flex;
   flex-direction: column;
@@ -1001,17 +1123,22 @@ a:hover {
 
 .chat-input-area {
   display: flex;
-  gap: var(--spacing-md);
+  justify-content: center;
   padding-top: var(--spacing-lg);
   border-top: 1px solid rgba(0, 212, 255, 0.1);
 }
 
+.chat-compose {
+  position: relative;
+  width: min(100%, 860px);
+}
+
 .chat-input {
-  flex: 1;
+  width: 100%;
   background: var(--bg-secondary);
   border: 1px solid rgba(0, 212, 255, 0.2);
   color: var(--text-primary);
-  padding: 0.75rem 1rem;
+  padding: 0.9rem 4.5rem 0.9rem 1rem;
   border-radius: var(--radius-md);
   font-size: 0.95rem;
 }
@@ -1020,6 +1147,16 @@ a:hover {
   outline: none;
   border-color: var(--neon-blue);
   box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+}
+
+.chat-send-btn {
+  position: absolute;
+  right: 0.35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: 46px;
+  height: 46px;
+  padding: 0;
 }
 
 .chat-info-panel {
@@ -1658,6 +1795,10 @@ a:hover {
     height: auto;
     min-height: 100vh;
   }
+
+  .joined-teams-list {
+    flex-direction: column;
+  }
   
   .landing-container {
     flex-direction: column;
@@ -1814,6 +1955,15 @@ a:hover {
     display: none;
   }
 
+  .chat-main {
+    border-right: none;
+    min-height: 100vh;
+  }
+
+  .chat-send-btn {
+    right: 0.25rem;
+  }
+
   .games-feed {
     grid-template-columns: 1fr;
   }
@@ -1916,6 +2066,10 @@ a:hover {
 
   .game-card-footer .btn {
     width: 100%;
+  }
+
+  .joined-teams-panel {
+    padding: var(--spacing-md);
   }
 }
 
