@@ -253,10 +253,11 @@ async function handleSignup(event) {
     // Clear form
     event.target.reset();
 
-    // Navigate to dashboard after a brief delay
+    // Navigate to profile after a brief delay
     setTimeout(() => {
-      navigateTo("dashboard");
-    }, 1500);
+      populateProfileFields();
+      navigateTo("profile");
+    }, 900);
   } catch (error) {
     console.error("Signup error:", error);
     showNotification("An error occurred during signup. Please try again.");
@@ -290,6 +291,7 @@ async function handleProfileSave(event) {
   event.preventDefault();
   const nick = document.getElementById("profile-nick").value;
   const email = document.getElementById("profile-email").value;
+  const password = document.getElementById("profile-password").value;
   const lang = document.getElementById("profile-lang").value;
   const age = document.getElementById("profile-age").value;
 
@@ -299,11 +301,63 @@ async function handleProfileSave(event) {
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   user.nick = nick;
   user.email = email;
+  if (password) {
+    user.password = password;
+  }
   user.language = lang;
   user.age = age;
   localStorage.setItem("user", JSON.stringify(user));
 
   showNotification("Profile updated successfully!");
+}
+
+function togglePasswordVisibility(button) {
+  const targetId = button.getAttribute("data-target");
+  const targetInput = document.getElementById(targetId);
+
+  if (!targetInput) {
+    return;
+  }
+
+  const icon = button.querySelector("i");
+  const isPasswordHidden = targetInput.type === "password";
+
+  targetInput.type = isPasswordHidden ? "text" : "password";
+
+  if (icon) {
+    icon.classList.toggle("fa-eye", !isPasswordHidden);
+    icon.classList.toggle("fa-eye-slash", isPasswordHidden);
+  }
+
+  button.setAttribute(
+    "aria-label",
+    isPasswordHidden ? "Hide password" : "Show password",
+  );
+}
+
+function populateProfileFields() {
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+
+  const profileNick = document.getElementById("profile-nick");
+  const profileEmail = document.getElementById("profile-email");
+  const profileAge = document.getElementById("profile-age");
+  const profileLang = document.getElementById("profile-lang");
+
+  if (profileNick && userData.nick) {
+    profileNick.value = userData.nick;
+  }
+
+  if (profileEmail && userData.email) {
+    profileEmail.value = userData.email;
+  }
+
+  if (profileAge && userData.age) {
+    profileAge.value = userData.age;
+  }
+
+  if (profileLang && userData.language) {
+    profileLang.value = userData.language;
+  }
 }
 
 // Notification System
@@ -415,6 +469,13 @@ document.addEventListener("DOMContentLoaded", () => {
   } else {
     console.warn("Signup form not found");
   }
+
+  const passwordToggleButtons = document.querySelectorAll(".password-toggle");
+  passwordToggleButtons.forEach((button) => {
+    button.addEventListener("click", () => togglePasswordVisibility(button));
+  });
+
+  populateProfileFields();
 
   const navItems = document.querySelectorAll(".nav-item");
 

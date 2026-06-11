@@ -16,7 +16,7 @@
       <div class="landing-container">
         <div class="landing-content">
           <div class="landing-hero">
-            <h1 class="landing-title">GameHaton</h1>
+            <h1 class="landing-title">LetsPlay</h1>
             <p class="landing-subtitle">
               Unite. Play. Conquer.<br />Find your gaming team and dominate
               together.
@@ -46,44 +46,110 @@
 
     <!-- Login Screen -->
     <section id="login" class="screen">
-      <div class="auth-container">
-        <div class="auth-card">
-          <div class="auth-header">
-            <h2>Welcome Back</h2>
-            <p>Log in to your GameHaton account</p>
-          </div>
-          <form class="auth-form">
-            <div class="form-group">
-              <label for="login-email">Email</label>
-              <input
-                type="email"
-                id="login-email"
-                placeholder="your@email.com"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="login-password">Password</label>
-              <input
-                type="password"
-                id="login-password"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div class="form-checkbox">
-              <input type="checkbox" id="remember-me" />
-              <label for="remember-me">Remember me</label>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full">
-              Login
-            </button>
-          </form>
-          <div class="auth-footer">
+      <div class="auth-shell">
+        <aside class="auth-visual">
+          <div class="auth-visual-copy">
+            <span class="auth-kicker">Lobby access</span>
+            <h2>Find your squad. Launch faster.</h2>
             <p>
-              Don't have an account?
-              <a href="#" onclick="navigateTo('signup')">Sign Up</a>
+              Join live sessions, see who is online, and jump straight into a
+              match-ready community.
             </p>
+          </div>
+
+          <div class="auth-carousel">
+            <article class="auth-slide auth-slide-blue">
+              <div class="auth-slide-top">
+                <span>Valorant</span>
+                <span>5v5</span>
+              </div>
+              <h3>Ranked night</h3>
+              <p>2 open slots, microphone required, queue starting soon.</p>
+              <div class="auth-slide-meta">
+                <span>Live now</span>
+                <span>EU West</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-purple">
+              <div class="auth-slide-top">
+                <span>CS2</span>
+                <span>Competitive</span>
+              </div>
+              <h3>Team stack</h3>
+              <p>
+                High-skill players looking for a fifth and a clean comms setup.
+              </p>
+              <div class="auth-slide-meta">
+                <span>58/64 players</span>
+                <span>Matchmaking</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-green">
+              <div class="auth-slide-top">
+                <span>Dota 2</span>
+                <span>Tournament</span>
+              </div>
+              <h3>Draft ready</h3>
+              <p>
+                Looking for carry, mid, and support players before bracket lock.
+              </p>
+              <div class="auth-slide-meta">
+                <span>3 seats open</span>
+                <span>Team chat on</span>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <div class="auth-panel">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h2>Welcome Back</h2>
+              <p>Log in to your GameHaton account</p>
+            </div>
+            <form class="auth-form">
+              <div class="form-group">
+                <label for="login-email">Email</label>
+                <input
+                  type="email"
+                  id="login-email"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="login-password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="login-password"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-checkbox">
+                <input type="checkbox" id="remember-me" />
+                <label for="remember-me">Remember me</label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Login
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>
+                Don't have an account?
+                <a href="#" onclick="navigateTo('signup')">Sign Up</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -91,79 +157,159 @@
 
     <!-- Sign Up Screen -->
     <section id="signup" class="screen">
-      <div class="auth-container">
-        <div class="auth-card auth-card-signup">
-          <div class="auth-header">
-            <h2>Join GameHaton</h2>
-            <p>Create your gaming profile</p>
-          </div>
-          <form class="auth-form">
-            <div class="form-group">
-              <label for="signup-nick">Nickname</label>
-              <input
-                type="text"
-                id="signup-nick"
-                placeholder="Your gaming name"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="signup-email">Email</label>
-              <input
-                type="email"
-                id="signup-email"
-                placeholder="your@email.com"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="signup-password">Password</label>
-              <input
-                type="password"
-                id="signup-password"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="signup-confirm">Confirm Password</label>
-              <input
-                type="password"
-                id="signup-confirm"
-                placeholder="••••••••"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="signup-age">Age</label>
-              <input
-                type="number"
-                id="signup-age"
-                placeholder="18"
-                min="13"
-                max="120"
-                required
-              />
-            </div>
-            <div class="form-group">
-              <label for="signup-lang">Language</label>
-              <select id="signup-lang" required>
-                <option value="">Select Language</option>
-                <option value="en">English</option>
-                <option value="az">Azerbaijani</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-              </select>
-            </div>
-            <button type="submit" class="btn btn-primary btn-full">
-              Create Account
-            </button>
-          </form>
-          <div class="auth-footer">
+      <div class="auth-shell">
+        <aside class="auth-visual">
+          <div class="auth-visual-copy">
+            <span class="auth-kicker">Create profile</span>
+            <h2>Build your player identity.</h2>
             <p>
-              Already have an account?
-              <a href="#" onclick="navigateTo('login')">Login</a>
+              Set your nickname, preferred language, and game style before you
+              enter the lobby.
             </p>
+          </div>
+
+          <div class="auth-carousel">
+            <article class="auth-slide auth-slide-purple">
+              <div class="auth-slide-top">
+                <span>Steam</span>
+                <span>Linked</span>
+              </div>
+              <h3>Progress sync</h3>
+              <p>
+                Keep your favorite games, achievements, and teammates in one
+                place.
+              </p>
+              <div class="auth-slide-meta">
+                <span>Profile ready</span>
+                <span>Secure</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-blue">
+              <div class="auth-slide-top">
+                <span>Discord</span>
+                <span>Voice chat</span>
+              </div>
+              <h3>Stay connected</h3>
+              <p>
+                Link your account and move from team chat into your match
+                instantly.
+              </p>
+              <div class="auth-slide-meta">
+                <span>Live presence</span>
+                <span>Team hub</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-green">
+              <div class="auth-slide-top">
+                <span>Epic</span>
+                <span>Game list</span>
+              </div>
+              <h3>Game roster</h3>
+              <p>
+                Add your favorite games and find squads that match your style.
+              </p>
+              <div class="auth-slide-meta">
+                <span>3 games saved</span>
+                <span>Ready to play</span>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <div class="auth-panel">
+          <div class="auth-card auth-card-signup">
+            <div class="auth-header">
+              <h2>Join GameHaton</h2>
+              <p>Create your gaming profile</p>
+            </div>
+            <form class="auth-form">
+              <div class="form-group">
+                <label for="signup-nick">Nickname</label>
+                <input
+                  type="text"
+                  id="signup-nick"
+                  placeholder="Your gaming name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-password">Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="signup-password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="signup-password"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="signup-confirm"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="signup-confirm"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="signup-age">Age</label>
+                <input
+                  type="number"
+                  id="signup-age"
+                  placeholder="18"
+                  min="13"
+                  max="120"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-lang">Language</label>
+                <select id="signup-lang" required>
+                  <option value="">Select Language</option>
+                  <option value="en">English</option>
+                  <option value="az">Azerbaijani</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Create Account
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>
+                Already have an account?
+                <a href="#" onclick="navigateTo('login')">Login</a>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -533,130 +679,146 @@
 
     <!-- Profile Settings -->
     <section id="profile" class="screen">
-      <div class="profile-container">
+      <div class="profile-shell">
         <div class="profile-header">
-          <h2>My Profile</h2>
-          <button class="btn btn-sm" onclick="navigateTo('dashboard')">
-            <i class="fas fa-arrow-left"></i> Back
+          <div class="profile-header-copy">
+            <span class="profile-kicker">PRDFL</span>
+            <h2>Profile</h2>
+            <p>Manage your identity, game list, and account links.</p>
+          </div>
+          <button
+            class="btn btn-sm btn-outline"
+            onclick="navigateTo('dashboard')"
+          >
+            <i class="fas fa-arrow-left"></i> Back to Lobby
           </button>
         </div>
 
-        <div class="profile-content">
-          <!-- Profile Form -->
-          <div class="profile-form-section">
-            <h3>Account Information</h3>
-            <form class="profile-form" onsubmit="handleProfileSave(event)">
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="profile-nick">Nickname</label>
-                  <input
-                    type="text"
-                    id="profile-nick"
-                    value="ProArtist"
-                    required
-                  />
+        <div class="profile-layout">
+          <div class="profile-editor">
+            <div class="profile-card">
+              <form class="profile-form" onsubmit="handleProfileSave(event)">
+                <div class="profile-form-title">
+                  <h3>Player Details</h3>
+                  <p>Update the core account fields below.</p>
                 </div>
-                <div class="form-group">
-                  <label for="profile-email">Email</label>
-                  <input
-                    type="email"
-                    id="profile-email"
-                    value="proartist@gamehaton.com"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="profile-password">Password</label>
-                  <input
-                    type="password"
-                    id="profile-password"
-                    placeholder="••••••••"
-                  />
-                </div>
-                <div class="form-group">
-                  <label for="profile-confirm">Confirm Password</label>
-                  <input
-                    type="password"
-                    id="profile-confirm"
-                    placeholder="••••••••"
-                  />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="profile-lang">Language</label>
-                  <select id="profile-lang" required>
-                    <option value="en" selected>English</option>
-                    <option value="az">Azerbaijani</option>
-                    <option value="es">Spanish</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="profile-age">Age</label>
-                  <input
-                    type="number"
-                    id="profile-age"
-                    value="24"
-                    min="13"
-                    max="120"
-                    required
-                  />
-                </div>
-              </div>
 
-              <button type="submit" class="btn btn-neon btn-full">
-                <i class="fas fa-save"></i> Save Changes
-              </button>
-            </form>
-          </div>
+                <div class="profile-grid">
+                  <div class="form-group">
+                    <label for="profile-nick">Nick</label>
+                    <input
+                      type="text"
+                      id="profile-nick"
+                      value="ProArtist"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input
+                      type="email"
+                      id="profile-email"
+                      value="proartist@gamehaton.com"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-password">Password</label>
+                    <div class="password-field">
+                      <input
+                        type="password"
+                        id="profile-password"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="profile-password"
+                        aria-label="Show password"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-age">Age</label>
+                    <input
+                      type="number"
+                      id="profile-age"
+                      value="24"
+                      min="13"
+                      max="120"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-lang">Language</label>
+                    <select id="profile-lang" required>
+                      <option value="en" selected>English</option>
+                      <option value="az">Azerbaijani</option>
+                      <option value="es">Spanish</option>
+                    </select>
+                  </div>
+                </div>
 
-          <!-- Integrations Section -->
-          <div class="integrations-section">
-            <h3>Connected Accounts</h3>
-            <div class="integrations-grid">
-              <div class="integration-card">
-                <i class="fab fa-discord"></i>
-                <h4>Discord</h4>
-                <p>Connect your Discord account</p>
-                <button class="btn btn-sm btn-outline">Connect</button>
-              </div>
-              <div class="integration-card">
-                <i class="fab fa-steam"></i>
-                <h4>Steam</h4>
-                <p>Link your Steam profile</p>
-                <button class="btn btn-sm btn-outline">Connect</button>
-              </div>
-              <div class="integration-card">
-                <i class="fas fa-gamepad"></i>
-                <h4>Epic Games</h4>
-                <p>Connect your Epic Games account</p>
-                <button class="btn btn-sm btn-outline">Connect</button>
-              </div>
+                <div class="profile-game-list">
+                  <label>Game List</label>
+                  <div class="games-grid">
+                    <div class="game-tag">
+                      Counter-Strike 2
+                      <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag">
+                      Valorant
+                      <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag">
+                      Dota 2 <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag-add">
+                      <input type="text" placeholder="Add game..." />
+                      <button type="button" class="btn btn-sm">+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="profile-actions">
+                  <button type="submit" class="btn btn-neon btn-full">
+                    <i class="fas fa-save"></i> Save
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
-          <!-- Game Preferences -->
-          <div class="games-section">
-            <h3>Favorite Games</h3>
-            <div class="games-grid">
-              <div class="game-tag">
-                Counter-Strike 2
-                <button type="button" class="remove-tag">×</button>
+          <aside class="profile-sidebar">
+            <div class="profile-side-card profile-side-primary">
+              <span class="profile-side-label">Discord</span>
+              <h3>Community hub</h3>
+              <p>
+                Link your Discord account to keep voice chat and team invites in
+                sync.
+              </p>
+              <button class="btn btn-sm btn-outline">Connect</button>
+            </div>
+
+            <div class="profile-side-stack">
+              <div class="profile-link-card">
+                <div>
+                  <span class="profile-link-label">Steam</span>
+                  <p>Match your library and achievements.</p>
+                </div>
+                <button class="btn btn-sm btn-outline">Link</button>
               </div>
-              <div class="game-tag">
-                Valorant <button type="button" class="remove-tag">×</button>
-              </div>
-              <div class="game-tag">
-                Dota 2 <button type="button" class="remove-tag">×</button>
-              </div>
-              <div class="game-tag-add">
-                <input type="text" placeholder="Add game..." />
-                <button type="button" class="btn btn-sm">+</button>
+              <div class="profile-link-card">
+                <div>
+                  <span class="profile-link-label">Epic Games</span>
+                  <p>Import your favorite multiplayer titles.</p>
+                </div>
+                <button class="btn btn-sm btn-outline">Link</button>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
     </section>

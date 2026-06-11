@@ -25,7 +25,7 @@
    - Age: `21`
    - Language: Select any option
 4. Click **Create Account** button
-5. You should see a success notification and navigate to the Dashboard
+5. You should see a success notification and navigate to the Profile screen
 
 ### ✅ Automated Testing (Fastest)
 
@@ -60,7 +60,7 @@
 - ✓ Passwords must match
 - ✓ Age required (13-120 years old)
 - ✓ Language required (must select)
-- ✓ Success: Stores data and navigates to dashboard
+- ✓ Success: Stores data and navigates to profile
 
 ## Console Debugging
 
@@ -142,7 +142,7 @@ window.GameHatonApp.showNotification("Test"); // Test notification
 - [ ] Password match validation works
 - [ ] Age validation works (13+ required)
 - [ ] Language selection required
-- [ ] Form submission navigates to dashboard
+- [ ] Form submission navigates to profile
 - [ ] User data saved to localStorage
 
 ### Dashboard
