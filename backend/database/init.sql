@@ -1,13 +1,14 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
---CREATING LANGUAGES
-CREATE TABLE languages(
+-- CREATING LANGUAGES
+CREATE TABLE IF NOT EXISTS languages(
     id SERIAL PRIMARY KEY,
-    lang_name VARCHAR(250) NOT NULL UNIQE, --EX english
-    lang_code VARCHAR(10) NOT NULL UNIQE --EX eng
+    lang_name VARCHAR(250) NOT NULL UNIQUE, -- Səhv düzəldildi: UNIQUE
+    lang_code VARCHAR(10) NOT NULL UNIQUE   -- Səhv düzəldildi: UNIQUE
 );
 
-CREATE TABLE users (
+-- CREATING USERS
+CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nickname VARCHAR(50) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -19,14 +20,15 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---MANY TO MANY CONNECTING TABLE
-CREATE TABLE user_languages (
+-- MANY TO MANY CONNECTING TABLE (Users <-> Languages)
+CREATE TABLE IF NOT EXISTS user_languages (
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     language_id INT REFERENCES languages(id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, language_id)
 );
 
-CREATE TABLE rooms (
+-- CREATING ROOMS
+CREATE TABLE IF NOT EXISTS rooms (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     description TEXT,
     game_name VARCHAR(100) NOT NULL,
@@ -36,18 +38,21 @@ CREATE TABLE rooms (
     max_age INT DEFAULT 99,
     max_players INT NOT NULL DEFAULT 5,
     host_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    is_active BOOLEAN DEFAULT TRUE,
+    -- Köhnə koddakı status məntiqini qorumaq üçün VARCHAR etdik:
+    status VARCHAR(20) DEFAULT 'active', 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE room_members (
+-- ROOM MEMBERS TABLE (Many-to-Many)
+CREATE TABLE IF NOT EXISTS room_members (
     room_id UUID REFERENCES rooms(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (room_id, user_id)
 );
 
-CREATE TABLE messages (
+-- CREATING MESSAGES
+CREATE TABLE IF NOT EXISTS messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     room_id UUID REFERENCES rooms(id) ON DELETE CASCADE,
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
@@ -55,9 +60,10 @@ CREATE TABLE messages (
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- INSERT DEFAULT LANGUAGES (ON CONFLICT əlavə olundu ki, hər dəfə backend başlayanda xəta verməsin)
 INSERT INTO languages (lang_name, lang_code) VALUES 
 ('Azerbaijani', 'az'),
 ('English', 'en'),
 ('Russian', 'ru'),
-('Turkish', 'tr');
-
+('Turkish', 'tr')
+ON CONFLICT (lang_code) DO NOTHING;
