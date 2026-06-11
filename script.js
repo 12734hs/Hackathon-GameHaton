@@ -25,6 +25,56 @@ function navigateTo(screenId) {
   }
 }
 
+const responsiveQueries = {
+  mobile: window.matchMedia("(max-width: 768px)"),
+  touch: window.matchMedia("(pointer: coarse)"),
+};
+
+const responsiveState = {
+  isMobile: responsiveQueries.mobile.matches,
+  isTouch: responsiveQueries.touch.matches,
+};
+
+function updateResponsiveState() {
+  responsiveState.isMobile = responsiveQueries.mobile.matches;
+  responsiveState.isTouch = responsiveQueries.touch.matches;
+
+  const sidebar = document.getElementById("dashboard-sidebar");
+  const sidebarToggle = document.querySelector(".sidebar-toggle");
+
+  if (!responsiveState.isMobile && sidebar) {
+    sidebar.classList.remove("open");
+  }
+
+  if (sidebarToggle) {
+    const isOpen = sidebar ? sidebar.classList.contains("open") : false;
+    sidebarToggle.setAttribute(
+      "aria-expanded",
+      responsiveState.isMobile && isOpen ? "true" : "false",
+    );
+  }
+
+  document.body.dataset.viewport = responsiveState.isMobile
+    ? "mobile"
+    : "desktop";
+  document.body.classList.toggle("is-mobile", responsiveState.isMobile);
+  document.body.classList.toggle("is-touch", responsiveState.isTouch);
+}
+
+function toggleDashboardSidebar() {
+  if (!responsiveState.isMobile) {
+    return;
+  }
+
+  const sidebar = document.getElementById("dashboard-sidebar");
+  if (!sidebar) {
+    return;
+  }
+
+  sidebar.classList.toggle("open");
+  updateResponsiveState();
+}
+
 // Modal Management
 function openCreateGameModal() {
   const modal = document.getElementById("createGameModal");
@@ -58,7 +108,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 // Form Handlers
-function handleLogin(event) {
+async function handleLogin(event) {
   event.preventDefault();
 
   try {
@@ -114,7 +164,7 @@ function handleLogin(event) {
   }
 }
 
-function handleSignup(event) {
+async function handleSignup(event) {
   event.preventDefault();
 
   try {
@@ -213,7 +263,7 @@ function handleSignup(event) {
   }
 }
 
-function handleCreateGame(event) {
+async function handleCreateGame(event) {
   event.preventDefault();
   const gameName = document.getElementById("game-name").value;
   const gameDate = document.getElementById("game-date").value;
@@ -236,7 +286,7 @@ function handleCreateGame(event) {
   event.target.reset();
 }
 
-function handleProfileSave(event) {
+async function handleProfileSave(event) {
   event.preventDefault();
   const nick = document.getElementById("profile-nick").value;
   const email = document.getElementById("profile-email").value;
@@ -262,19 +312,19 @@ function showNotification(message) {
   notification.className = "notification";
   notification.textContent = message;
 
+  const isMobileNotification = responsiveState.isMobile;
+
   // Add styles for notification
   notification.style.cssText = `
         position: fixed;
-        top: 20px;
-        right: 20px;
+        ${isMobileNotification ? "left: 16px; right: 16px; bottom: 16px; top: auto; max-width: none;" : "top: 20px; right: 20px; max-width: 400px;"}
         background: linear-gradient(135deg, #ff0080, #00d4ff);
         color: white;
         padding: 16px 24px;
         border-radius: 8px;
         box-shadow: 0 0 30px rgba(255, 0, 128, 0.5), 0 0 60px rgba(0, 212, 255, 0.3);
         z-index: 2000;
-        animation: slideInRight 0.3s ease;
-        max-width: 400px;
+        animation: ${isMobileNotification ? "slideInUp" : "slideInRight"} 0.3s ease;
         font-weight: 600;
         border: 1px solid rgba(255, 255, 255, 0.2);
     `;
@@ -283,7 +333,9 @@ function showNotification(message) {
 
   // Auto remove after 3 seconds
   setTimeout(() => {
-    notification.style.animation = "slideOutRight 0.3s ease";
+    notification.style.animation = isMobileNotification
+      ? "slideOutDown 0.3s ease"
+      : "slideOutRight 0.3s ease";
     setTimeout(() => {
       notification.remove();
     }, 300);
@@ -303,6 +355,17 @@ style.textContent = `
             opacity: 1;
         }
     }
+
+      @keyframes slideInUp {
+        from {
+          transform: translateY(24px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
     
     @keyframes slideOutRight {
         from {
@@ -314,11 +377,27 @@ style.textContent = `
             opacity: 0;
         }
     }
+
+      @keyframes slideOutDown {
+        from {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateY(24px);
+          opacity: 0;
+        }
+      }
 `;
 document.head.appendChild(style);
 
 // Sidebar Navigation Active States
 document.addEventListener("DOMContentLoaded", () => {
+  updateResponsiveState();
+
+  responsiveQueries.mobile.addEventListener("change", updateResponsiveState);
+  responsiveQueries.touch.addEventListener("change", updateResponsiveState);
+
   // Initialize form handlers
   const loginForm = document.querySelector(".screen#login .auth-form");
   const signupForm = document.querySelector(".screen#signup .auth-form");
@@ -348,6 +427,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Add active to clicked item
       item.classList.add("active");
+
+          if (responsiveState.isMobile) {
+            const sidebar = document.getElementById("dashboard-sidebar");
+            if (sidebar) {
+              sidebar.classList.remove("open");
+              updateResponsiveState();
+            }
+          }
     });
   });
 
@@ -409,8 +496,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Add game on Enter key
-    addGameInput.addEventListener("keypress", (e) => {
+    addGameInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
+        e.preventDefault();
         addGameBtn.click();
       }
     });
@@ -422,8 +510,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (chatInput && sendBtn) {
     sendBtn.addEventListener("click", sendMessage);
-    chatInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
         sendMessage();
       }
     });
@@ -514,7 +603,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Prevent form submission on Enter in text fields (except textarea)
-document.addEventListener("keypress", (e) => {
+document.addEventListener("keydown", (e) => {
   if (
     e.key === "Enter" &&
     e.target.tagName === "INPUT" &&
@@ -618,6 +707,7 @@ window.GameHatonApp = {
   navigateTo,
   openCreateGameModal,
   closeCreateGameModal,
+  toggleDashboardSidebar,
   showNotification,
   handleLogin,
   handleSignup,

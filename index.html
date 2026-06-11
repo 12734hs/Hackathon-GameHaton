@@ -52,7 +52,7 @@
             <h2>Welcome Back</h2>
             <p>Log in to your GameHaton account</p>
           </div>
-          <form class="auth-form" onsubmit="handleLogin(event)">
+          <form class="auth-form">
             <div class="form-group">
               <label for="login-email">Email</label>
               <input
@@ -97,7 +97,7 @@
             <h2>Join GameHaton</h2>
             <p>Create your gaming profile</p>
           </div>
-          <form class="auth-form" onsubmit="handleSignup(event)">
+          <form class="auth-form">
             <div class="form-group">
               <label for="signup-nick">Nickname</label>
               <input
@@ -173,7 +173,7 @@
     <section id="dashboard" class="screen">
       <div class="dashboard-wrapper">
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="dashboard-sidebar">
           <div class="sidebar-header">
             <h3 class="sidebar-logo">GameHaton</h3>
           </div>
@@ -209,6 +209,16 @@
         <main class="dashboard-main">
           <!-- Top Header -->
           <div class="dashboard-header">
+            <button
+              class="sidebar-toggle"
+              type="button"
+              onclick="toggleDashboardSidebar()"
+              aria-controls="dashboard-sidebar"
+              aria-expanded="false"
+            >
+              <i class="fas fa-bars"></i>
+              <span>Menu</span>
+            </button>
             <h2>Active Games</h2>
             <button class="btn btn-neon" onclick="openCreateGameModal()">
               <i class="fas fa-plus"></i> Add Game
