@@ -8,7 +8,7 @@ from datetime import datetime
 def create_app():
     app = Flask(__name__)
     app.secret_key = "dev-secret-key"
-    CORS(app, supports_credentials=True)
+    CORS(app, supports_credentials=True, origins=["http://localhost:5500", "http://127.0.0.1:5500", "http://localhost:3000", "null", "*"])
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/gamer_matchmaking'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
@@ -27,8 +27,8 @@ def public_room(room):
         "min_age": room.min_age, 
         "max_age": room.max_age, 
         "max_players": room.max_players,
-        "game_start_time": room.game_start_time.strftime("%Y-%m-%d %H:%M:%S"),
-        "game_end_time": room.game_end_time.strftime("%Y-%m-%d %H:%M:%S")
+        "game_start_time": room.game_start_time.strftime("%Y-%m-%d %H:%M:%S") if room.game_start_time else None,
+        "game_end_time": room.game_end_time.strftime("%Y-%m-%d %H:%M:%S") if room.game_end_time else None
     }
 @app.route("/api/rooms", methods=["GET"])
 def get_all_rooms():
@@ -53,8 +53,8 @@ def create_room():
         max_age=int(data.get("max_age", 99)), 
         max_players=int(data.get("max_players", 5)),
         # Yeni sahələr əlavə olundu:
-        game_start_time=datetime.fromisoformat(data.get("game_start_time")),
-        game_end_time=datetime.fromisoformat(data.get("game_end_time"))
+        game_start_time=datetime.fromisoformat(data.get("game_start_time")) if data.get("game_start_time") else None,
+        game_end_time=datetime.fromisoformat(data.get("game_end_time")) if data.get("game_end_time") else None
     )
     db.session.add(new_room)
     db.session.commit()
@@ -173,4 +173,4 @@ def get_room_messages(room_id):
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5501)
