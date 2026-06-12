@@ -1,5 +1,5 @@
 /* ============================================
-   GAMEHATON - JavaScript Functionality
+   LetsPlay - JavaScript Functionality
    ============================================ */
 
 const API_BASE = "https://backend-dev-production-4961.up.railway.app/";
@@ -491,7 +491,7 @@ async function handleSignup(event) {
     }
 
     localStorage.setItem("user", JSON.stringify(data.user));
-    showNotification("🎮 Account created! Welcome to GameHaton!");
+    showNotification("🎮 Account created! Welcome to LetsPlay!");
     event.target.reset();
     setTimeout(() => {
       populateProfileFields();
@@ -798,7 +798,7 @@ window.addEventListener("load", () => {
   document.body.style.opacity = "1";
   const firstNavItem = document.querySelector(".nav-item");
   if (firstNavItem) firstNavItem.classList.add("active");
-  console.log("🎮 GameHaton Platform Initialized");
+  console.log("🎮 LetsPlay Platform Initialized");
 });
 
 // Expose for debugging
