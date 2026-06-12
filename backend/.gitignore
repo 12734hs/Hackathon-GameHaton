@@ -1,0 +1,21 @@
+.venv/
+backend/.venv/
+__pycache__/
+*.pyc
+.env
+.venv/
+backend/.venv/
+__pycache__/
+*.pyc
+.env
+
+# Python virtual environments
+.venv/
+backend/.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Env files
+.env
