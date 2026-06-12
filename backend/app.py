@@ -7,15 +7,29 @@ from datetime import datetime
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "dev-secret-key"
+
+    app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")
+
     CORS(app, supports_credentials=True)
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:1234@localhost:5432/gamer_matchmaking'
+
+    database_url = os.getenv(
+        "DATABASE_URL",
+        "postgresql://postgres:1234@localhost:5432/gamer_matchmaking")
+
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
     db.init_app(app)
     app.register_blueprint(auth_bp)
+
     return app
 
 app = create_app()
+with app.app_context():
+    db.create_all()
 
 def public_room(room):
     return {
@@ -171,6 +185,8 @@ def get_room_messages(room_id):
     return jsonify({"messages": result}), 200
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
-    app.run(debug=True, port=5000)
+    app.run(
+        host="0.0.0.0",
+        port=int(os.getenv("PORT", 5000)),
+        debug=True
+    )
