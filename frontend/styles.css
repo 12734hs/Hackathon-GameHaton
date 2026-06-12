@@ -964,8 +964,20 @@ a:hover {
 .chat-wrapper {
   display: grid;
   grid-template-columns: 250px 1fr 300px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width:100%;
   height: 100vh;
   background: var(--bg-primary);
+}
+
+.chat-main {
+  min-width: 0;
+}
+
+.chat-info-panel {
+  width: 280px;
+  justify-self: end;
 }
 
 .chat-sidebar {
