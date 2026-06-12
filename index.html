@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GameHaton - Gaming Community Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <!-- Landing / Splash Page -->
+    <section id="landing" class="screen active">
+      <div class="landing-container">
+        <div class="landing-content">
+          <div class="landing-hero">
+            <h1 class="landing-title">LetsPlay</h1>
+            <p class="landing-subtitle">
+              Unite. Play. Conquer.<br />Find your gaming team and dominate
+              together.
+            </p>
+          </div>
+          <div class="landing-actions">
+            <button
+              class="btn btn-primary btn-lg"
+              onclick="navigateTo('login')"
+            >
+              <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <button
+              class="btn btn-secondary btn-lg"
+              onclick="navigateTo('signup')"
+            >
+              <i class="fas fa-user-plus"></i> Sign Up
+            </button>
+          </div>
+        </div>
+        <div class="landing-decoration">
+          <div class="neon-orb orb-1"></div>
+          <div class="neon-orb orb-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Login Screen -->
+    <section id="login" class="screen">
+      <div class="auth-shell">
+        <aside class="auth-visual">
+          <div class="auth-visual-copy">
+            <span class="auth-kicker">Lobby access</span>
+            <h2>Find your squad. Launch faster.</h2>
+            <p>
+              Join live sessions, see who is online, and jump straight into a
+              match-ready community.
+            </p>
+          </div>
+
+          <div class="auth-carousel">
+            <article class="auth-slide auth-slide-blue">
+              <div class="auth-slide-top">
+                
+                <span>Valorant</span>
+                <span>5v5</span>
+              </div>
+              <h3>Ranked night</h3>
+              <p>2 open slots, microphone required, queue starting soon.</p>
+              <div class="auth-slide-meta">
+                <span>Live now</span>
+                <span>EU West</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-purple">
+              <div class="auth-slide-top">
+                <span>CS2</span>
+                <span>Competitive</span>
+              </div>
+              <h3>Team stack</h3>
+              <p>
+                High-skill players looking for a fifth and a clean comms setup.
+              </p>
+              <div class="auth-slide-meta">
+                <span>58/64 players</span>
+                <span>Matchmaking</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-green">
+              <div class="auth-slide-top">
+                <span>Dota 2</span>
+                <span>Tournament</span>
+              </div>
+              <h3>Draft ready</h3>
+              <p>
+                Looking for carry, mid, and support players before bracket lock.
+              </p>
+              <div class="auth-slide-meta">
+                <span>3 seats open</span>
+                <span>Team chat on</span>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <div class="auth-panel">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h2>Welcome Back</h2>
+              <p>Log in to your GameHaton account</p>
+            </div>
+            <form class="auth-form">
+              <div class="form-group">
+                <label for="login-email">Email</label>
+                <input
+                  type="email"
+                  id="login-email"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="login-password">Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="login-password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="login-password"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-checkbox">
+                <input type="checkbox" id="remember-me" />
+                <label for="remember-me">Remember me</label>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Login
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>
+                Don't have an account?
+                <a href="#" onclick="navigateTo('signup')">Sign Up</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sign Up Screen -->
+    <section id="signup" class="screen">
+      <div class="auth-shell">
+        <aside class="auth-visual">
+          <div class="auth-visual-copy">
+            <span class="auth-kicker">Create profile</span>
+            <h2>Build your player identity.</h2>
+            <p>
+              Set your nickname, preferred language, and game style before you
+              enter the lobby.
+            </p>
+          </div>
+
+          <div class="auth-carousel">
+            <article class="auth-slide auth-slide-purple">
+              <div class="auth-slide-top">
+                <span>Steam</span>
+                <span>Linked</span>
+              </div>
+              <h3>Progress sync</h3>
+              <p>
+                Keep your favorite games, achievements, and teammates in one
+                place.
+              </p>
+              <div class="auth-slide-meta">
+                <span>Profile ready</span>
+                <span>Secure</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-blue">
+              <div class="auth-slide-top">
+                <span>Discord</span>
+                <span>Voice chat</span>
+              </div>
+              <h3>Stay connected</h3>
+              <p>
+                Link your account and move from team chat into your match
+                instantly.
+              </p>
+              <div class="auth-slide-meta">
+                <span>Live presence</span>
+                <span>Team hub</span>
+              </div>
+            </article>
+            <article class="auth-slide auth-slide-green">
+              <div class="auth-slide-top">
+                <span>Epic</span>
+                <span>Game list</span>
+              </div>
+              <h3>Game roster</h3>
+              <p>
+                Add your favorite games and find squads that match your style.
+              </p>
+              <div class="auth-slide-meta">
+                <span>3 games saved</span>
+                <span>Ready to play</span>
+              </div>
+            </article>
+          </div>
+        </aside>
+
+        <div class="auth-panel">
+          <div class="auth-card auth-card-signup">
+            <div class="auth-header">
+              <h2>Join GameHaton</h2>
+              <p>Create your gaming profile</p>
+            </div>
+            <form class="auth-form">
+              <div class="form-group">
+                <label for="signup-nick">Nickname</label>
+                <input
+                  type="text"
+                  id="signup-nick"
+                  placeholder="Your gaming name"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-password">Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="signup-password"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="signup-password"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="signup-confirm">Confirm Password</label>
+                <div class="password-field">
+                  <input
+                    type="password"
+                    id="signup-confirm"
+                    placeholder="••••••••"
+                    required
+                  />
+                  <button
+                    type="button"
+                    class="password-toggle"
+                    data-target="signup-confirm"
+                    aria-label="Show password"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="signup-age">Age</label>
+                <input
+                  type="number"
+                  id="signup-age"
+                  placeholder="18"
+                  min="13"
+                  max="120"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-lang">Language</label>
+                <select id="signup-lang" required>
+                  <option value="">Select Language</option>
+                  <option value="en">English</option>
+                  <option value="az">Azerbaijani</option>
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary btn-full">
+                Create Account
+              </button>
+            </form>
+            <div class="auth-footer">
+              <p>
+                Already have an account?
+                <a href="#" onclick="navigateTo('login')">Login</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard / Activity Feed -->
+    <section id="dashboard" class="screen">
+      <div class="dashboard-wrapper">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="dashboard-sidebar">
+          <div class="sidebar-header">
+            <h3 class="sidebar-logo">GameHaton</h3>
+          </div>
+          <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-section="all">
+              <i class="fas fa-home"></i>
+              <span>Main</span>
+            </a>
+          </nav>
+
+          <section class="sidebar-teams" id="joinedTeamsPanel">
+            <button
+              class="sidebar-teams-toggle"
+              type="button"
+              onclick="toggleJoinedTeamsDropdown()"
+            >
+              <span class="sidebar-teams-title">Joined Teams</span>
+              <span class="sidebar-teams-count" id="joinedTeamsCount">0</span>
+              <i class="fas fa-chevron-down" id="joinedTeamsChevron"></i>
+            </button>
+            <div class="sidebar-teams-list" id="joinedTeamsList">
+            </div>
+          </section>
+          <div class="sidebar-footer">
+            <button class="btn btn-small" onclick="navigateTo('profile')">
+              <i class="fas fa-user"></i> Profile
+            </button>
+            <button class="btn btn-small" onclick="handleLogout()">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+          <!-- Top Header -->
+          <div class="dashboard-header">
+            <button
+              class="sidebar-toggle"
+              type="button"
+              onclick="toggleDashboardSidebar()"
+              aria-controls="dashboard-sidebar"
+              aria-expanded="false"
+            >
+              <i class="fas fa-bars"></i>
+              <span>Menu</span>
+            </button>
+            <h2>Active Games</h2>
+            <button class="btn btn-neon" onclick="openCreateGameModal()">
+              <i class="fas fa-plus"></i> Add Game
+            </button>
+          </div>
+
+          <!-- Game Cards Feed -->
+          <div class="games-feed">
+            <div class="game-card">
+              <div class="game-card-header">
+                <h3 class="game-title">Counter-Strike 2</h3>
+                <span class="game-date"
+                  ><i class="fas fa-calendar"></i> May 15, 2026</span
+                >
+              </div>
+              <div class="game-stats">
+                <span class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <strong>58/64</strong> Players
+                </span>
+                <span class="stat-item">
+                  <i class="fas fa-flag"></i>
+                  <strong>Competitive</strong>
+                </span>
+              </div>
+              <p class="game-description">
+                Looking for skilled players for a competitive match. Must have
+                microphone and team communication experience. Ranked mode
+                preferred.
+              </p>
+              <div class="game-card-footer">
+                <button
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Counter-Strike 2"
+                  onclick="joinTeam('Counter-Strike 2', this)"
+                >
+                  Join Team
+                </button>
+              </div>
+            </div>
+
+            <div class="game-card">
+              <div class="game-card-header">
+                <h3 class="game-title">Valorant Squad</h3>
+                <span class="game-date"
+                  ><i class="fas fa-calendar"></i> May 16, 2026</span
+                >
+              </div>
+              <div class="game-stats">
+                <span class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <strong>4/5</strong> Players
+                </span>
+                <span class="stat-item">
+                  <i class="fas fa-flag"></i>
+                  <strong>Casual</strong>
+                </span>
+              </div>
+              <p class="game-description">
+                Casual Valorant squad looking for chill players. New to the
+                game? No problem! We teach and have fun together.
+              </p>
+              <div class="game-card-footer">
+                <button
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Valorant Squad"
+                  onclick="joinTeam('Valorant Squad', this)"
+                >
+                  Join Team
+                </button>
+              </div>
+            </div>
+
+            <div class="game-card">
+              <div class="game-card-header">
+                <h3 class="game-title">Dota 2 Tournament</h3>
+                <span class="game-date"
+                  ><i class="fas fa-calendar"></i> May 20, 2026</span
+                >
+              </div>
+              <div class="game-stats">
+                <span class="stat-item">
+                  <i class="fas fa-users"></i>
+                  <strong>3/5</strong> Players
+                </span>
+                <span class="stat-item">
+                  <i class="fas fa-flag"></i>
+                  <strong>Tournament</strong>
+                </span>
+              </div>
+              <p class="game-description">
+                Forming a team for upcoming Dota 2 tournament. Need Mid, Carry,
+                and Support players with tournament experience.
+              </p>
+              <div class="game-card-footer">
+                <button
+                  class="btn btn-sm btn-outline team-join-btn"
+                  data-team="Dota 2 Tournament"
+                  onclick="joinTeam('Dota 2 Tournament', this)"
+                >
+                  Join Team
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <!-- Create Game Modal -->
+    <div id="createGameModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create New Game Session</h2>
+          <button class="modal-close" onclick="closeCreateGameModal()">
+            &times;
+          </button>
+        </div>
+        <form class="modal-form" onsubmit="handleCreateGame(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-name">Game Name</label>
+              <input
+                type="text"
+                id="game-name"
+                placeholder="e.g., Counter-Strike 2"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="game-lang">Language</label>
+              <select id="game-lang" required>
+                <option value="">Select Language</option>
+                <option value="English">English</option>
+                <option value="Azerbaijani">Azerbaijani</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="Russian">Russian</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-start-date">Start Date</label>
+              <input type="date" id="game-start-date" required />
+            </div>
+            <div class="form-group">
+              <label for="game-start-time">Start Time</label>
+              <input type="time" id="game-start-time" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-end-date">End Date</label>
+              <input type="date" id="game-end-date" required />
+            </div>
+            <div class="form-group">
+              <label for="game-end-time">End Time</label>
+              <input type="time" id="game-end-time" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="player-amount">Max Players</label>
+              <input
+                type="number"
+                id="player-amount"
+                placeholder="5"
+                min="1"
+                max="100"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="game-min-age">Min Age</label>
+              <input type="number" id="game-min-age" placeholder="0" min="0" max="120" value="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-max-age">Max Age</label>
+              <input type="number" id="game-max-age" placeholder="99" min="0" max="120" value="99" />
+            </div>
+            <div class="form-group"></div>
+          </div>
+          <div class="form-group">
+            <label for="game-desc">Description</label>
+            <textarea
+              id="game-desc"
+              placeholder="Tell players about your game session..."
+              rows="4"
+              required
+            ></textarea>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline"
+              onclick="closeCreateGameModal()"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-neon">Create Game</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <section id="chat" class="screen">
+      <div class="chat-wrapper">
+        <!-- Users List -->
+        <aside class="chat-sidebar">
+          <div class="chat-sidebar-header">
+            <h3>Attending Players</h3>
+            <p class="chat-sidebar-team" id="chatSidebarTeam">Select a team from the dashboard</p>
+          </div>
+          <div class="users-list" id="chatMembersList">
+            <div class="user-item active">
+              <div class="user-avatar">--</div>
+              <div class="user-info">
+                <span class="user-name">No team selected</span>
+                <span class="user-status">Join a team from Main</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Chat Main -->
+        <main class="chat-main">
+          <div class="chat-header">
+            <div>
+              <h2 id="chatTeamTitle">Team Chat</h2>
+              <p class="chat-subtitle" id="chatTeamSubtitle">Choose a team from Joined Teams</p>
+            </div>
+            <button
+              class="btn btn-sm btn-outline"
+              onclick="navigateTo('dashboard')"
+            >
+              <i class="fas fa-arrow-left"></i> Back
+            </button>
+          </div>
+
+          <!-- Messages -->
+          <div class="chat-messages" id="chatMessages">
+            <div class="message-group">
+              <div class="message message-other">
+                <span class="message-sender">Team Chat</span>
+                <p>Select a team from the dashboard to start chatting.</p>
+                <span class="message-time">Now</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Input -->
+          <div class="chat-input-area">
+            <div class="chat-compose">
+              <input
+                type="text"
+                class="chat-input"
+                placeholder="Type your message..."
+              />
+              <button class="btn btn-sm btn-neon chat-send-btn">
+                <i class="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </main>
+
+        <!-- Session Info Panel -->
+        <aside class="chat-info-panel">
+          <div class="info-section">
+            <h4>Session Details</h4>
+            <div class="info-item">
+              <span class="label">Session ID</span>
+              <span class="value">CS2-2026-001</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Leader</span>
+              <span class="value">ProArtist</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Type</span>
+              <span class="value">Competitive</span>
+            </div>
+          </div>
+          <div class="info-section">
+            <h4>Description</h4>
+            <p>
+              Looking for skilled players for a competitive match. Must have
+              microphone and team communication experience.
+            </p>
+          </div>
+          <div class="info-section">
+            <h4>Session Date</h4>
+            <p>May 15, 2026 • 8:00 PM</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Profile Settings -->
+    <section id="profile" class="screen">
+      <div class="profile-shell">
+        <div class="profile-header">
+          <div class="profile-header-copy">
+            <span class="profile-kicker">PRDFL</span>
+            <h2>Profile</h2>
+            <p>Manage your identity, game list, and account links.</p>
+          </div>
+          <button
+            class="btn btn-sm btn-outline"
+            onclick="navigateTo('dashboard')"
+          >
+            <i class="fas fa-arrow-left"></i> Back to Lobby
+          </button>
+        </div>
+
+        <div class="profile-layout">
+          <div class="profile-editor">
+            <div class="profile-card">
+              <form class="profile-form" onsubmit="handleProfileSave(event)">
+                <div class="profile-form-title">
+                  <h3>Player Details</h3>
+                  <p>Update the core account fields below.</p>
+                </div>
+
+                <div class="profile-grid">
+                  <div class="form-group">
+                    <label for="profile-nick">Nick</label>
+                    <input
+                      type="text"
+                      id="profile-nick"
+                      value="ProArtist"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-email">Email</label>
+                    <input
+                      type="email"
+                      id="profile-email"
+                      value="proartist@gamehaton.com"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-password">Password</label>
+                    <div class="password-field">
+                      <input
+                        type="password"
+                        id="profile-password"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="profile-password"
+                        aria-label="Show password"
+                      >
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-age">Age</label>
+                    <input
+                      type="number"
+                      id="profile-age"
+                      value="24"
+                      min="13"
+                      max="120"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label for="profile-lang">Language</label>
+                    <select id="profile-lang" required>
+                      <option value="en" selected>English</option>
+                      <option value="az">Azerbaijani</option>
+                      <option value="es">Spanish</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="profile-game-list">
+                  <label>Game List</label>
+                  <div class="games-grid">
+                    <div class="game-tag">
+                      Counter-Strike 2
+                      <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag">
+                      Valorant
+                      <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag">
+                      Dota 2 <button type="button" class="remove-tag">×</button>
+                    </div>
+                    <div class="game-tag-add">
+                      <input type="text" placeholder="Add game..." />
+                      <button type="button" class="btn btn-sm">+</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="profile-actions">
+                  <button type="submit" class="btn btn-neon btn-full">
+                    <i class="fas fa-save"></i> Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <aside class="profile-sidebar">
+            <div class="profile-side-card profile-side-primary">
+              <span class="profile-side-label">Discord</span>
+              <h3>Community hub</h3>
+              <p>
+                Link your Discord account to keep voice chat and team invites in
+                sync.
+              </p>
+              <button class="btn btn-sm btn-outline">Connect</button>
+            </div>
+
+            <div class="profile-side-stack">
+              <div class="profile-link-card">
+                <div>
+                  <span class="profile-link-label">Steam</span>
+                  <p>Match your library and achievements.</p>
+                </div>
+                <button class="btn btn-sm btn-outline">Link</button>
+              </div>
+              <div class="profile-link-card">
+                <div>
+                  <span class="profile-link-label">Epic Games</span>
+                  <p>Import your favorite multiplayer titles.</p>
+                </div>
+                <button class="btn btn-sm btn-outline">Link</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>
