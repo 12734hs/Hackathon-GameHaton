@@ -2,16 +2,29 @@
    GAMEHATON - JavaScript Functionality
    ============================================ */
 
-// Screen Navigation System
+const API_BASE = "https://backend-dev-production-4961.up.railway.app/";
+
+// ============================================
+// API HELPERS
+// ============================================
+async function apiFetch(path, options = {}) {
+  const res = await fetch(API_BASE + path, {
+    credentials: "include",
+    headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+    ...options,
+  });
+  const data = await res.json();
+  return { ok: res.ok, status: res.status, data };
+}
+
+// ============================================
+// SCREEN NAVIGATION SYSTEM
+// ============================================
 function navigateTo(screenId) {
   try {
-    // Hide all screens
     const screens = document.querySelectorAll(".screen");
-    screens.forEach((screen) => {
-      screen.classList.remove("active");
-    });
+    screens.forEach((screen) => screen.classList.remove("active"));
 
-    // Show target screen
     const targetScreen = document.getElementById(screenId);
     if (targetScreen) {
       targetScreen.classList.add("active");
@@ -19,21 +32,33 @@ function navigateTo(screenId) {
       console.log(`✓ Navigated to: ${screenId}`);
 
       if (screenId === "dashboard") {
+        loadRooms();
         renderJoinedTeams();
       }
 
       if (screenId === "chat") {
         const activeTeam = getActiveTeam();
-        renderChatTeam(activeTeam?.name || "");
+        if (activeTeam?.id) {
+          loadRoomChat(activeTeam.id, activeTeam.name);
+        } else {
+          renderChatTeam("", []);
+        }
+      }
+
+      if (screenId === "profile") {
+        loadProfile();
       }
     } else {
-      console.error(`✗ Screen with ID "${screenId}" not found`);
+      console.error(`✗ Screen "${screenId}" not found`);
     }
   } catch (error) {
     console.error("Navigation error:", error);
   }
 }
 
+// ============================================
+// RESPONSIVE
+// ============================================
 const responsiveQueries = {
   mobile: window.matchMedia("(max-width: 768px)"),
   touch: window.matchMedia("(pointer: coarse)"),
@@ -63,52 +88,26 @@ function updateResponsiveState() {
     );
   }
 
-  document.body.dataset.viewport = responsiveState.isMobile
-    ? "mobile"
-    : "desktop";
+  document.body.dataset.viewport = responsiveState.isMobile ? "mobile" : "desktop";
   document.body.classList.toggle("is-mobile", responsiveState.isMobile);
   document.body.classList.toggle("is-touch", responsiveState.isTouch);
 }
 
 function toggleDashboardSidebar() {
-  if (!responsiveState.isMobile) {
-    return;
-  }
-
+  if (!responsiveState.isMobile) return;
   const sidebar = document.getElementById("dashboard-sidebar");
-  if (!sidebar) {
-    return;
-  }
-
+  if (!sidebar) return;
   sidebar.classList.toggle("open");
   updateResponsiveState();
 }
 
-const teamDirectory = {
-  "Counter-Strike 2": [
-    { name: "ProArtist", status: "Online", initials: "PA" },
-    { name: "NeonKing", status: "Online", initials: "NK" },
-    { name: "SkyGamer", status: "Away", initials: "SG" },
-    { name: "FXMaster", status: "Online", initials: "FX" },
-  ],
-  "Valorant Squad": [
-    { name: "Valkyrie", status: "Online", initials: "VK" },
-    { name: "ApexBlitz", status: "Busy", initials: "AB" },
-    { name: "RushLine", status: "Online", initials: "RL" },
-    { name: "Cipher", status: "Away", initials: "CP" },
-  ],
-  "Dota 2 Tournament": [
-    { name: "MidLord", status: "Online", initials: "ML" },
-    { name: "CarryFox", status: "Online", initials: "CF" },
-    { name: "WardKing", status: "Away", initials: "WK" },
-    { name: "Stacker", status: "Online", initials: "ST" },
-  ],
-};
-
+// ============================================
+// JOINED TEAMS (LOCAL STATE)
+// ============================================
 function getJoinedTeams() {
   try {
     return JSON.parse(localStorage.getItem("joinedTeams") || "[]");
-  } catch (error) {
+  } catch {
     return [];
   }
 }
@@ -120,7 +119,7 @@ function setJoinedTeams(teams) {
 function getActiveTeam() {
   try {
     return JSON.parse(localStorage.getItem("activeTeam") || "null");
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -132,16 +131,12 @@ function setActiveTeam(team) {
 function renderJoinedTeams() {
   const list = document.getElementById("joinedTeamsList");
   const count = document.getElementById("joinedTeamsCount");
-  if (!list) {
-    return;
-  }
+  if (!list) return;
 
   const joinedTeams = getJoinedTeams();
   const activeTeam = getActiveTeam();
 
-  if (count) {
-    count.textContent = String(joinedTeams.length);
-  }
+  if (count) count.textContent = String(joinedTeams.length);
 
   if (!joinedTeams.length) {
     list.innerHTML = "";
@@ -149,159 +144,251 @@ function renderJoinedTeams() {
   }
 
   list.innerHTML = joinedTeams
-    .map((teamName) => {
-      const isActive = activeTeam?.name === teamName;
+    .map((team) => {
+      const isActive = activeTeam?.id === team.id;
       return `
-        <button class="joined-team-chip ${isActive ? "active" : ""}" type="button" onclick="openTeamChat('${teamName.replace(/'/g, "\\'")}')">
+        <button class="joined-team-chip ${isActive ? "active" : ""}" type="button" onclick="openTeamChat('${team.id}', '${team.name.replace(/'/g, "\\'")}')">
           <i class="fas fa-users"></i>
-          <span>${teamName}</span>
+          <span>${team.name}</span>
         </button>
       `;
     })
     .join("");
 }
 
-function removeJoinedGameCards() {
-  const joinedTeams = getJoinedTeams();
-  const cards = document.querySelectorAll(".game-card");
-
-  cards.forEach((card) => {
-    const title = card.querySelector(".game-title")?.textContent?.trim();
-    if (title && joinedTeams.includes(title)) {
-      card.remove();
-    }
-  });
-}
-
 function toggleJoinedTeamsDropdown() {
   const list = document.getElementById("joinedTeamsList");
   const chevron = document.getElementById("joinedTeamsChevron");
-
-  if (!list) {
-    return;
-  }
-
+  if (!list) return;
   const isOpen = list.classList.toggle("is-open");
-  if (chevron) {
-    chevron.style.transform = isOpen ? "rotate(0deg)" : "rotate(-90deg)";
+  if (chevron) chevron.style.transform = isOpen ? "rotate(0deg)" : "rotate(-90deg)";
+}
+
+// ============================================
+// DASHBOARD — LOAD ROOMS FROM API
+// ============================================
+async function loadRooms() {
+  const feed = document.querySelector(".games-feed");
+  if (!feed) return;
+
+  feed.innerHTML = `<div class="loading-spinner" style="text-align:center;padding:2rem;color:var(--text-secondary)"><i class="fas fa-spinner fa-spin"></i> Loading games...</div>`;
+
+  try {
+    const { ok, data } = await apiFetch("/api/rooms");
+    if (!ok) {
+      feed.innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem">Failed to load games.</p>`;
+      return;
+    }
+
+    const joinedTeams = getJoinedTeams();
+    const joinedIds = joinedTeams.map((t) => t.id);
+    const rooms = (data.rooms || []).filter((r) => !joinedIds.includes(r.id));
+
+    if (!rooms.length) {
+      feed.innerHTML = `<p style="color:var(--text-secondary);text-align:center;padding:2rem">No active games found. Create one!</p>`;
+      return;
+    }
+
+    feed.innerHTML = rooms.map((room) => buildGameCard(room)).join("");
+  } catch (err) {
+    console.error("loadRooms error:", err);
+    feed.innerHTML = `<p style="color:var(--danger);text-align:center;padding:2rem">Could not connect to server.</p>`;
   }
 }
 
-function renderChatTeam(teamName) {
-  const team = teamDirectory[teamName] || [];
+function buildGameCard(room) {
+  const startDate = room.game_start_time
+    ? new Date(room.game_start_time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+    : "TBD";
+  const startTime = room.game_start_time
+    ? new Date(room.game_start_time).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    : "";
+  const endTime = room.game_end_time
+    ? new Date(room.game_end_time).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })
+    : "";
+
+  return `
+    <div class="game-card" data-room-id="${room.id}">
+      <div class="game-card-header">
+        <h3 class="game-title">${escapeHtml(room.game_name)}</h3>
+        <span class="game-date"><i class="fas fa-calendar"></i> ${startDate}</span>
+      </div>
+      <div class="game-stats">
+        <span class="stat-item"><i class="fas fa-users"></i><strong>${room.max_players}</strong> Max Players</span>
+        <span class="stat-item"><i class="fas fa-language"></i><strong>${escapeHtml(room.language)}</strong></span>
+        ${startTime ? `<span class="stat-item"><i class="fas fa-clock"></i><strong>${startTime}${endTime ? ' – ' + endTime : ''}</strong></span>` : ''}
+        ${room.min_age || room.max_age ? `<span class="stat-item"><i class="fas fa-user"></i><strong>Age ${room.min_age}–${room.max_age}</strong></span>` : ''}
+      </div>
+      <p class="game-description">${escapeHtml(room.description)}</p>
+      <div class="game-card-footer">
+        <button class="btn btn-sm btn-outline team-join-btn" onclick="joinTeam('${room.id}', '${room.game_name.replace(/'/g, "\\'")}', this)">
+          Join Team
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+async function joinTeam(roomId, roomName, buttonElement) {
+  const { ok, data } = await apiFetch(`/api/rooms/${roomId}/join`, { method: "POST" });
+
+  if (!ok) {
+    showNotification(data.message || "Failed to join team");
+    return;
+  }
+
+  const joinedTeams = getJoinedTeams();
+  if (!joinedTeams.find((t) => t.id === roomId)) {
+    joinedTeams.push({ id: roomId, name: roomName });
+    setJoinedTeams(joinedTeams);
+  }
+
+  setActiveTeam({ id: roomId, name: roomName });
+  renderJoinedTeams();
+
+  if (buttonElement) {
+    const card = buttonElement.closest(".game-card");
+    if (card) card.remove();
+  }
+
+  showNotification(`${roomName} added to Joined Teams`);
+}
+
+function openTeamChat(roomId, roomName) {
+  setActiveTeam({ id: roomId, name: roomName });
+  renderJoinedTeams();
+  navigateTo("chat");
+  loadRoomChat(roomId, roomName);
+}
+
+// ============================================
+// CHAT — LOAD & SEND MESSAGES VIA API
+// ============================================
+let chatPollInterval = null;
+
+async function loadRoomChat(roomId, roomName) {
   const chatTeamTitle = document.getElementById("chatTeamTitle");
   const chatTeamSubtitle = document.getElementById("chatTeamSubtitle");
   const chatSidebarTeam = document.getElementById("chatSidebarTeam");
   const chatMembersList = document.getElementById("chatMembersList");
   const chatMessages = document.getElementById("chatMessages");
 
-  if (chatTeamTitle) {
-    chatTeamTitle.textContent = teamName || "Team Chat";
-  }
+  if (chatTeamTitle) chatTeamTitle.textContent = roomName || "Team Chat";
+  if (chatSidebarTeam) chatSidebarTeam.textContent = roomName || "Select a team";
 
-  if (chatTeamSubtitle) {
-    chatTeamSubtitle.textContent = team.length
-      ? `${team.length} attending players`
-      : "Choose a team from Joined Teams";
-  }
+  if (chatPollInterval) clearInterval(chatPollInterval);
 
-  if (chatSidebarTeam) {
-    chatSidebarTeam.textContent = teamName || "Select a team from the dashboard";
-  }
+  try {
+    const { ok, data } = await apiFetch(`/api/rooms/${roomId}`);
+    if (!ok) return;
 
-  if (chatMembersList) {
-    if (!team.length) {
-      chatMembersList.innerHTML = `
-        <div class="user-item active">
-          <div class="user-avatar">--</div>
-          <div class="user-info">
-            <span class="user-name">No team selected</span>
-            <span class="user-status">Join a team from Main</span>
-          </div>
-        </div>
-      `;
-    } else {
-      chatMembersList.innerHTML = team
-        .map(
-          (member, index) => `
-            <div class="user-item ${index === 0 ? "active" : ""}">
-              <div class="user-avatar">${member.initials}</div>
-              <div class="user-info">
-                <span class="user-name">${member.name}</span>
-                <span class="user-status">${member.status}</span>
-              </div>
+    // Update session info panel
+    const infoItems = document.querySelectorAll(".info-item .value");
+    if (infoItems[0]) infoItems[0].textContent = roomId.slice(0, 8).toUpperCase();
+    if (infoItems[2]) infoItems[2].textContent = data.room?.language || "";
+
+    const descSection = document.querySelector(".info-section:nth-child(2) p");
+    if (descSection) descSection.textContent = data.room?.description || "";
+
+    const dateSection = document.querySelector(".info-section:nth-child(3) p");
+    if (dateSection && data.room?.game_start_time) {
+      const d = new Date(data.room.game_start_time);
+      dateSection.textContent = d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + " • " +
+        d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    }
+
+    // Members
+    const members = data.members || [];
+    if (chatTeamSubtitle) chatTeamSubtitle.textContent = `${members.length} attending players`;
+    if (chatMembersList) {
+      chatMembersList.innerHTML = members.length
+        ? members.map((m, i) => `
+          <div class="user-item ${i === 0 ? "active" : ""}">
+            <div class="user-avatar">${m.slice(0, 2).toUpperCase()}</div>
+            <div class="user-info">
+              <span class="user-name">${escapeHtml(m)}</span>
+              <span class="user-status">Online</span>
             </div>
-          `,
-        )
-        .join("");
+          </div>`).join("")
+        : `<div class="user-item"><div class="user-avatar">--</div><div class="user-info"><span class="user-name">No members yet</span></div></div>`;
     }
-  }
 
-  if (chatMessages) {
-    chatMessages.innerHTML = teamName
-      ? `
-        <div class="message-group">
-          <div class="message message-other">
-            <span class="message-sender">${teamName}</span>
-            <p>Team room opened. Say hi to your squad.</p>
-            <span class="message-time">Now</span>
-          </div>
-        </div>
-      `
-      : `
-        <div class="message-group">
-          <div class="message message-other">
-            <span class="message-sender">Team Chat</span>
-            <p>Select a team from the dashboard to start chatting.</p>
-            <span class="message-time">Now</span>
-          </div>
-        </div>
-      `;
+    // Messages
+    renderMessages(data.messages || [], chatMessages);
+
+    // Poll for new messages every 5s
+    chatPollInterval = setInterval(async () => {
+      const { ok: ok2, data: d2 } = await apiFetch(`/api/rooms/${roomId}/messages`);
+      if (ok2) renderMessages(d2.messages || [], chatMessages);
+    }, 5000);
+
+    // Wire up send button for this room
+    const chatInput = document.querySelector(".chat-input");
+    const sendBtn = document.querySelector(".chat-input-area .btn-neon");
+    if (chatInput) chatInput._roomId = roomId;
+
+    if (sendBtn) {
+      sendBtn.onclick = () => sendChatMessage(roomId);
+    }
+    if (chatInput) {
+      chatInput.onkeydown = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          sendChatMessage(roomId);
+        }
+      };
+    }
+  } catch (err) {
+    console.error("loadRoomChat error:", err);
   }
 }
 
-function joinTeam(teamName, buttonElement) {
-  const joinedTeams = getJoinedTeams();
-  if (!joinedTeams.includes(teamName)) {
-    joinedTeams.push(teamName);
-    setJoinedTeams(joinedTeams);
-  }
+function renderMessages(messages, container) {
+  if (!container) return;
+  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+  const myNick = userData.nickname || "";
 
-  setActiveTeam({ name: teamName });
-  renderJoinedTeams();
-  removeJoinedGameCards();
-  if (buttonElement) {
-    const card = buttonElement.closest(".game-card");
-    if (card) {
-      card.remove();
-    }
-  }
-  showNotification(`${teamName} added to Joined Teams`);
+  container.innerHTML = messages.length
+    ? messages.map((msg) => {
+        const isOwn = msg.nickname === myNick;
+        return `
+          <div class="message-group">
+            <div class="message ${isOwn ? "message-own" : "message-other"}">
+              ${!isOwn ? `<span class="message-sender">${escapeHtml(msg.nickname)}</span>` : ""}
+              <p>${escapeHtml(msg.content)}</p>
+              <span class="message-time">${new Date(msg.created_at).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}</span>
+            </div>
+          </div>`;
+      }).join("")
+    : `<div class="message-group"><div class="message message-other"><span class="message-sender">Team Chat</span><p>Say hi to your squad!</p><span class="message-time">Now</span></div></div>`;
+
+  container.scrollTop = container.scrollHeight;
 }
 
-function syncGameCardButtons() {
-  const teamButtons = document.querySelectorAll(".team-join-btn[data-team]");
+async function sendChatMessage(roomId) {
+  const chatInput = document.querySelector(".chat-input");
+  if (!chatInput) return;
+  const message = chatInput.value.trim();
+  if (!message) return;
 
-  teamButtons.forEach((button) => {
-    const teamName = button.getAttribute("data-team");
-    button.textContent = "Join Team";
-    button.classList.remove("btn-primary");
-    button.classList.add("btn-outline");
-    button.setAttribute(
-      "onclick",
-      `joinTeam('${teamName.replace(/'/g, "\\'")}', this)`,
-    );
+  const { ok, data } = await apiFetch(`/api/rooms/${roomId}/messages`, {
+    method: "POST",
+    body: JSON.stringify({ content: message }),
   });
+
+  if (ok) {
+    chatInput.value = "";
+    // Immediately re-fetch messages
+    const { ok: ok2, data: d2 } = await apiFetch(`/api/rooms/${roomId}/messages`);
+    if (ok2) renderMessages(d2.messages || [], document.getElementById("chatMessages"));
+  } else {
+    showNotification(data.message || "Could not send message");
+  }
 }
 
-function openTeamChat(teamName) {
-  setActiveTeam({ name: teamName });
-  renderJoinedTeams();
-  navigateTo("chat");
-  renderChatTeam(teamName);
-}
-
-// Modal Management
+// ============================================
+// MODAL MANAGEMENT
+// ============================================
 function openCreateGameModal() {
   const modal = document.getElementById("createGameModal");
   if (modal) {
@@ -318,692 +405,405 @@ function closeCreateGameModal() {
   }
 }
 
-// Close modal when clicking outside
 document.addEventListener("click", (e) => {
   const modal = document.getElementById("createGameModal");
-  if (modal && e.target === modal) {
-    closeCreateGameModal();
-  }
+  if (modal && e.target === modal) closeCreateGameModal();
 });
 
-// Close modal with Escape key
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    closeCreateGameModal();
-  }
+  if (e.key === "Escape") closeCreateGameModal();
 });
 
-// Form Handlers
+// ============================================
+// FORM HANDLERS
+// ============================================
+
+// LOGIN
 async function handleLogin(event) {
   event.preventDefault();
-
   try {
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value.trim();
-    const rememberMe = document.getElementById("remember-me").checked;
 
-    // Validation
-    if (!email) {
-      showNotification("Please enter your email");
-      document.getElementById("login-email").focus();
+    if (!email) { showNotification("Please enter your email"); return; }
+    if (!password || password.length < 6) { showNotification("Password must be at least 6 characters"); return; }
+
+    showNotification("Logging in...");
+
+    const { ok, data } = await apiFetch("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!ok) {
+      showNotification(data.message || "Login failed");
       return;
     }
 
-    if (!password) {
-      showNotification("Please enter your password");
-      document.getElementById("login-password").focus();
-      return;
-    }
-
-    if (password.length < 6) {
-      showNotification("Password must be at least 6 characters");
-      return;
-    }
-
-    // Simulate login with basic validation
-    console.log("Login attempt:", { email, password, rememberMe });
-
-    // Store user data in localStorage
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        email: email,
-        loggedIn: true,
-        rememberMe: rememberMe,
-        loginTime: new Date().toISOString(),
-      }),
-    );
-
-    // Show success message
+    localStorage.setItem("user", JSON.stringify(data.user));
     showNotification("Login successful! Welcome back!");
-
-    // Clear form
     event.target.reset();
-
-    // Navigate to dashboard after a brief delay
-    setTimeout(() => {
-      navigateTo("dashboard");
-    }, 500);
-  } catch (error) {
-    console.error("Login error:", error);
-    showNotification("An error occurred during login. Please try again.");
+    setTimeout(() => navigateTo("dashboard"), 500);
+  } catch (err) {
+    console.error("Login error:", err);
+    showNotification("Could not connect to server. Is the backend running?");
   }
 }
 
+// SIGNUP
 async function handleSignup(event) {
   event.preventDefault();
-
   try {
     const nick = document.getElementById("signup-nick").value.trim();
     const email = document.getElementById("signup-email").value.trim();
     const password = document.getElementById("signup-password").value;
     const confirm = document.getElementById("signup-confirm").value;
     const age = document.getElementById("signup-age").value;
-    const lang = document.getElementById("signup-lang").value;
+    const langVal = document.getElementById("signup-lang").value;
 
-    // Validation
-    if (!nick) {
-      showNotification("Please enter a nickname");
-      document.getElementById("signup-nick").focus();
-      return;
-    }
+    if (!nick || nick.length < 3) { showNotification("Nickname must be at least 3 characters"); return; }
+    if (!email) { showNotification("Please enter your email"); return; }
+    if (!password || password.length < 6) { showNotification("Password must be at least 6 characters"); return; }
+    if (password !== confirm) { showNotification("Passwords do not match!"); return; }
+    if (!age || age < 13) { showNotification("You must be at least 13 years old"); return; }
+    if (!langVal) { showNotification("Please select a language"); return; }
 
-    if (nick.length < 3) {
-      showNotification("Nickname must be at least 3 characters");
-      return;
-    }
+    // Map select option value to full language name for backend
+    const langMap = { en: "English", az: "Azerbaijani", es: "Spanish", fr: "French" };
+    const langName = langMap[langVal] || langVal;
 
-    if (!email) {
-      showNotification("Please enter your email");
-      document.getElementById("signup-email").focus();
-      return;
-    }
+    showNotification("Creating account...");
 
-    if (!password) {
-      showNotification("Please enter a password");
-      document.getElementById("signup-password").focus();
-      return;
-    }
-
-    if (password.length < 6) {
-      showNotification("Password must be at least 6 characters");
-      return;
-    }
-
-    if (password !== confirm) {
-      showNotification("Passwords do not match!");
-      document.getElementById("signup-confirm").focus();
-      return;
-    }
-
-    if (!age) {
-      showNotification("Please enter your age");
-      document.getElementById("signup-age").focus();
-      return;
-    }
-
-    if (age < 13) {
-      showNotification("You must be at least 13 years old to join LetsPlay!");
-      return;
-    }
-
-    if (age > 120) {
-      showNotification("Please enter a valid age");
-      return;
-    }
-
-    if (!lang) {
-      showNotification("Please select a language");
-      document.getElementById("signup-lang").focus();
-      return;
-    }
-
-    console.log("Signup attempt:", { nick, email, password, age, lang });
-
-    // Store user data
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        nick: nick,
-        email: email,
-        age: age,
-        language: lang,
-        loggedIn: true,
-        signupTime: new Date().toISOString(),
+    const { ok, data } = await apiFetch("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({
+        nickname: nick,
+        email,
+        password,
+        age: parseInt(age),
+        languages: [langName],
       }),
-    );
+    });
 
-    // Show success and navigate
-    showNotification("🎮 Account created successfully! Welcome to LetsPlay!");
+    if (!ok) {
+      showNotification(data.message || "Signup failed");
+      return;
+    }
 
-    // Clear form
+    localStorage.setItem("user", JSON.stringify(data.user));
+    showNotification("🎮 Account created! Welcome to GameHaton!");
     event.target.reset();
-
-    // Navigate to profile after a brief delay
     setTimeout(() => {
       populateProfileFields();
       navigateTo("profile");
     }, 900);
-  } catch (error) {
-    console.error("Signup error:", error);
-    showNotification("An error occurred during signup. Please try again.");
+  } catch (err) {
+    console.error("Signup error:", err);
+    showNotification("Could not connect to server. Is the backend running?");
   }
 }
 
+// CREATE GAME
 async function handleCreateGame(event) {
   event.preventDefault();
-  const gameName = document.getElementById("game-name").value;
-  const gameDate = document.getElementById("game-date").value;
-  const gameType = document.getElementById("game-type").value;
-  const playerAmount = document.getElementById("player-amount").value;
-  const gameDesc = document.getElementById("game-desc").value;
+  try {
+    const gameName = document.getElementById("game-name").value.trim();
+    const lang = document.getElementById("game-lang").value;
+    const startDate = document.getElementById("game-start-date").value;
+    const startTime = document.getElementById("game-start-time").value;
+    const endDate = document.getElementById("game-end-date").value;
+    const endTime = document.getElementById("game-end-time").value;
+    const maxPlayers = document.getElementById("player-amount").value;
+    const minAge = document.getElementById("game-min-age").value || "0";
+    const maxAge = document.getElementById("game-max-age").value || "99";
+    const desc = document.getElementById("game-desc").value.trim();
 
-  console.log("Game created:", {
-    name: gameName,
-    date: gameDate,
-    type: gameType,
-    players: playerAmount,
-    description: gameDesc,
-  });
+    if (!gameName || !lang || !startDate || !startTime || !endDate || !endTime || !maxPlayers || !desc) {
+      showNotification("Please fill in all required fields");
+      return;
+    }
 
-  showNotification(`Game "${gameName}" created successfully!`);
-  closeCreateGameModal();
+    const startISO = `${startDate}T${startTime}:00`;
+    const endISO = `${endDate}T${endTime}:00`;
 
-  // Reset form
-  event.target.reset();
+    if (new Date(endISO) <= new Date(startISO)) {
+      showNotification("End time must be after start time");
+      return;
+    }
+
+    const { ok, data } = await apiFetch("/api/rooms", {
+      method: "POST",
+      body: JSON.stringify({
+        game_name: gameName,
+        language: lang,
+        description: desc,
+        max_players: parseInt(maxPlayers),
+        min_age: parseInt(minAge),
+        max_age: parseInt(maxAge),
+        game_start_time: startISO,
+        game_end_time: endISO,
+      }),
+    });
+
+    if (!ok) {
+      showNotification(data.message || "Failed to create game");
+      return;
+    }
+
+    showNotification(`Game "${gameName}" created!`);
+    closeCreateGameModal();
+    event.target.reset();
+    loadRooms();
+  } catch (err) {
+    console.error("Create game error:", err);
+    showNotification("Could not connect to server.");
+  }
 }
 
+// PROFILE SAVE
 async function handleProfileSave(event) {
   event.preventDefault();
-  const nick = document.getElementById("profile-nick").value;
-  const email = document.getElementById("profile-email").value;
-  const password = document.getElementById("profile-password").value;
-  const lang = document.getElementById("profile-lang").value;
-  const age = document.getElementById("profile-age").value;
+  try {
+    const nick = document.getElementById("profile-nick").value.trim();
+    const age = document.getElementById("profile-age").value;
+    const lang = document.getElementById("profile-lang").value;
+    const steam = document.getElementById("profile-steam")?.value?.trim() || "";
+    const epic = document.getElementById("profile-epic")?.value?.trim() || "";
+    const discord = document.getElementById("profile-discord")?.value?.trim() || "";
 
-  console.log("Profile updated:", { nick, email, lang, age });
+    const langMap = { en: "English", az: "Azerbaijani", es: "Spanish" };
+    const langName = langMap[lang] || lang;
 
-  // Update localStorage
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  user.nick = nick;
-  user.email = email;
-  if (password) {
-    user.password = password;
+    const { ok, data } = await apiFetch("/api/profile/me", {
+      method: "PUT",
+      body: JSON.stringify({
+        nickname: nick,
+        age: parseInt(age),
+        languages: [langName],
+        steam,
+        epic,
+        discord,
+      }),
+    });
+
+    if (!ok) {
+      showNotification(data.message || "Profile update failed");
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(data.profile));
+    showNotification("Profile updated successfully!");
+  } catch (err) {
+    console.error("Profile save error:", err);
+    showNotification("Could not connect to server.");
   }
-  user.language = lang;
-  user.age = age;
-  localStorage.setItem("user", JSON.stringify(user));
-
-  showNotification("Profile updated successfully!");
 }
 
-function togglePasswordVisibility(button) {
-  const targetId = button.getAttribute("data-target");
-  const targetInput = document.getElementById(targetId);
-
-  if (!targetInput) {
-    return;
+// LOAD PROFILE
+async function loadProfile() {
+  try {
+    const { ok, data } = await apiFetch("/api/auth/me");
+    if (!ok) {
+      navigateTo("login");
+      return;
+    }
+    const user = data.user;
+    localStorage.setItem("user", JSON.stringify(user));
+    populateProfileFields(user);
+  } catch (err) {
+    console.error("loadProfile error:", err);
+    populateProfileFields();
   }
-
-  const icon = button.querySelector("i");
-  const isPasswordHidden = targetInput.type === "password";
-
-  targetInput.type = isPasswordHidden ? "text" : "password";
-
-  if (icon) {
-    icon.classList.toggle("fa-eye", !isPasswordHidden);
-    icon.classList.toggle("fa-eye-slash", isPasswordHidden);
-  }
-
-  button.setAttribute(
-    "aria-label",
-    isPasswordHidden ? "Hide password" : "Show password",
-  );
 }
 
-function populateProfileFields() {
-  const userData = JSON.parse(localStorage.getItem("user") || "{}");
+function populateProfileFields(userData) {
+  if (!userData) {
+    userData = JSON.parse(localStorage.getItem("user") || "{}");
+  }
 
   const profileNick = document.getElementById("profile-nick");
   const profileEmail = document.getElementById("profile-email");
   const profileAge = document.getElementById("profile-age");
   const profileLang = document.getElementById("profile-lang");
 
-  if (profileNick && userData.nick) {
-    profileNick.value = userData.nick;
-  }
+  if (profileNick && userData.nickname) profileNick.value = userData.nickname;
+  if (profileEmail && userData.email) profileEmail.value = userData.email;
+  if (profileAge && userData.age) profileAge.value = userData.age;
 
-  if (profileEmail && userData.email) {
-    profileEmail.value = userData.email;
-  }
-
-  if (profileAge && userData.age) {
-    profileAge.value = userData.age;
-  }
-
-  if (profileLang && userData.language) {
-    profileLang.value = userData.language;
+  if (profileLang && userData.languages && userData.languages.length) {
+    const langRevMap = { English: "en", Azerbaijani: "az", Spanish: "es" };
+    profileLang.value = langRevMap[userData.languages[0]] || userData.languages[0];
   }
 }
 
-// Notification System
+// PASSWORD TOGGLE
+function togglePasswordVisibility(button) {
+  const targetId = button.getAttribute("data-target");
+  const targetInput = document.getElementById(targetId);
+  if (!targetInput) return;
+  const icon = button.querySelector("i");
+  const isPasswordHidden = targetInput.type === "password";
+  targetInput.type = isPasswordHidden ? "text" : "password";
+  if (icon) {
+    icon.classList.toggle("fa-eye", !isPasswordHidden);
+    icon.classList.toggle("fa-eye-slash", isPasswordHidden);
+  }
+  button.setAttribute("aria-label", isPasswordHidden ? "Hide password" : "Show password");
+}
+
+// ============================================
+// NOTIFICATION SYSTEM
+// ============================================
 function showNotification(message) {
   const notification = document.createElement("div");
   notification.className = "notification";
   notification.textContent = message;
-
-  const isMobileNotification = responsiveState.isMobile;
-
-  // Add styles for notification
+  const isMobile = responsiveState.isMobile;
   notification.style.cssText = `
-        position: fixed;
-        ${isMobileNotification ? "left: 16px; right: 16px; bottom: 16px; top: auto; max-width: none;" : "top: 20px; right: 20px; max-width: 400px;"}
-        background: linear-gradient(135deg, #ff0080, #00d4ff);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        box-shadow: 0 0 30px rgba(255, 0, 128, 0.5), 0 0 60px rgba(0, 212, 255, 0.3);
-        z-index: 2000;
-        animation: ${isMobileNotification ? "slideInUp" : "slideInRight"} 0.3s ease;
-        font-weight: 600;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    `;
-
+    position: fixed;
+    ${isMobile ? "left:16px;right:16px;bottom:16px;top:auto;max-width:none;" : "top:20px;right:20px;max-width:400px;"}
+    background: linear-gradient(135deg, #ff0080, #00d4ff);
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    box-shadow: 0 0 30px rgba(255,0,128,0.5),0 0 60px rgba(0,212,255,0.3);
+    z-index: 2000;
+    animation: ${isMobile ? "slideInUp" : "slideInRight"} 0.3s ease;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+  `;
   document.body.appendChild(notification);
-
-  // Auto remove after 3 seconds
   setTimeout(() => {
-    notification.style.animation = isMobileNotification
-      ? "slideOutDown 0.3s ease"
-      : "slideOutRight 0.3s ease";
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
+    notification.style.animation = isMobile ? "slideOutDown 0.3s ease" : "slideOutRight 0.3s ease";
+    setTimeout(() => notification.remove(), 300);
   }, 3000);
 }
 
-// Add animation styles
 const style = document.createElement("style");
 style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-
-      @keyframes slideInUp {
-        from {
-          transform: translateY(24px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
-      }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-
-      @keyframes slideOutDown {
-        from {
-          transform: translateY(0);
-          opacity: 1;
-        }
-        to {
-          transform: translateY(24px);
-          opacity: 0;
-        }
-      }
+  @keyframes slideInRight { from{transform:translateX(400px);opacity:0} to{transform:translateX(0);opacity:1} }
+  @keyframes slideInUp { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+  @keyframes slideOutRight { from{transform:translateX(0);opacity:1} to{transform:translateX(400px);opacity:0} }
+  @keyframes slideOutDown { from{transform:translateY(0);opacity:1} to{transform:translateY(24px);opacity:0} }
 `;
 document.head.appendChild(style);
 
-// Sidebar Navigation Active States
+// ============================================
+// HELPERS
+// ============================================
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = String(text || "");
+  return div.innerHTML;
+}
+
+// ============================================
+// LOGOUT
+// ============================================
+async function handleLogout() {
+  await apiFetch("/api/auth/logout", { method: "POST" });
+  localStorage.removeItem("user");
+  localStorage.removeItem("joinedTeams");
+  localStorage.removeItem("activeTeam");
+  navigateTo("landing");
+}
+
+// ============================================
+// DOM READY
+// ============================================
 document.addEventListener("DOMContentLoaded", () => {
   updateResponsiveState();
   renderJoinedTeams();
-  removeJoinedGameCards();
-  syncGameCardButtons();
-
-    removeJoinedGameCards();
   responsiveQueries.mobile.addEventListener("change", updateResponsiveState);
   responsiveQueries.touch.addEventListener("change", updateResponsiveState);
 
-  // Initialize form handlers
+  // Form listeners
   const loginForm = document.querySelector(".screen#login .auth-form");
   const signupForm = document.querySelector(".screen#signup .auth-form");
+  if (loginForm) loginForm.addEventListener("submit", handleLogin);
+  if (signupForm) signupForm.addEventListener("submit", handleSignup);
 
-  if (loginForm) {
-    loginForm.addEventListener("submit", handleLogin);
-    console.log("Login form initialized");
-  } else {
-    console.warn("Login form not found");
-  }
+  // Password toggles
+  document.querySelectorAll(".password-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => togglePasswordVisibility(btn));
+  });
 
-  if (signupForm) {
-    signupForm.addEventListener("submit", handleSignup);
-    console.log("Signup form initialized");
-  } else {
-    console.warn("Signup form not found");
-  }
+  // Profile form
+  const profileForm = document.querySelector(".profile-form");
+  if (profileForm) profileForm.addEventListener("submit", handleProfileSave);
 
-  const passwordToggleButtons = document.querySelectorAll(".password-toggle");
-  passwordToggleButtons.forEach((button) => {
-    button.addEventListener("click", () => togglePasswordVisibility(button));
+  // Logout button — wire it to real logout
+  document.querySelectorAll(".btn-small").forEach((btn) => {
+    if (btn.textContent.trim().includes("Logout")) {
+      btn.onclick = handleLogout;
+    }
   });
 
   populateProfileFields();
 
+  // Nav item active states
   const navItems = document.querySelectorAll(".nav-item");
-
   navItems.forEach((item) => {
     item.addEventListener("click", (e) => {
       e.preventDefault();
-
-      // Remove active from all items
       navItems.forEach((nav) => nav.classList.remove("active"));
-
-      // Add active to clicked item
       item.classList.add("active");
-
-          if (responsiveState.isMobile) {
-            const sidebar = document.getElementById("dashboard-sidebar");
-            if (sidebar) {
-              sidebar.classList.remove("open");
-              updateResponsiveState();
-            }
-          }
-    });
-  });
-
-  // Load user data if logged in
-  const user = localStorage.getItem("user");
-  if (user) {
-    const userData = JSON.parse(user);
-    if (userData.loggedIn) {
-      // Optionally navigate to dashboard or keep current page
-    }
-  }
-
-  // Game card hover effects
-  const gameCards = document.querySelectorAll(".game-card");
-  gameCards.forEach((card) => {
-    card.addEventListener("mouseenter", function () {
-      this.style.animationPlayState = "paused";
+      if (responsiveState.isMobile) {
+        const sidebar = document.getElementById("dashboard-sidebar");
+        if (sidebar) { sidebar.classList.remove("open"); updateResponsiveState(); }
+      }
     });
   });
 
   // Remove tag functionality
-  const removeTags = document.querySelectorAll(".remove-tag");
-  removeTags.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      btn.parentElement.remove();
-    });
+  document.querySelectorAll(".remove-tag").forEach((btn) => {
+    btn.addEventListener("click", (e) => { e.preventDefault(); btn.parentElement.remove(); });
   });
 
-  // Add game tag functionality
+  // Add game tag
   const addGameBtn = document.querySelector(".game-tag-add .btn");
   const addGameInput = document.querySelector(".game-tag-add input");
-
   if (addGameBtn && addGameInput) {
     addGameBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      const gameName = addGameInput.value.trim();
-
-      if (gameName) {
-        // Create new tag
-        const newTag = document.createElement("div");
-        newTag.className = "game-tag";
-        newTag.innerHTML = `${gameName} <button type="button" class="remove-tag">×</button>`;
-
-        // Insert before the add input
-        addGameInput.parentElement.parentElement.insertBefore(
-          newTag,
-          addGameInput.parentElement,
-        );
-
-        // Clear input
+      const name = addGameInput.value.trim();
+      if (name) {
+        const tag = document.createElement("div");
+        tag.className = "game-tag";
+        tag.innerHTML = `${name} <button type="button" class="remove-tag">×</button>`;
+        addGameInput.parentElement.parentElement.insertBefore(tag, addGameInput.parentElement);
         addGameInput.value = "";
-
-        // Add remove functionality to new tag
-        newTag.querySelector(".remove-tag").addEventListener("click", () => {
-          newTag.remove();
-        });
+        tag.querySelector(".remove-tag").addEventListener("click", () => tag.remove());
       }
     });
-
-    // Add game on Enter key
-    addGameInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        addGameBtn.click();
-      }
-    });
+    addGameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); addGameBtn.click(); } });
   }
 
-  // Chat message sending
-  const chatInput = document.querySelector(".chat-input");
-  const sendBtn = document.querySelector(".chat-input-area .btn-neon");
-
-  if (chatInput && sendBtn) {
-    sendBtn.addEventListener("click", sendMessage);
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  }
-
-  function sendMessage() {
-    const message = chatInput.value.trim();
-
-    if (message) {
-      // Create new message element
-      const messageGroup = document.createElement("div");
-      messageGroup.className = "message-group";
-      messageGroup.innerHTML = `
-                <div class="message message-own">
-                    <p>${escapeHtml(message)}</p>
-                    <span class="message-time">Now</span>
-                </div>
-            `;
-
-      // Add to chat
-      const chatMessages = document.querySelector(".chat-messages");
-      chatMessages.appendChild(messageGroup);
-
-      // Scroll to bottom
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      // Clear input
-      chatInput.value = "";
-      chatInput.focus();
+  // Check if already logged in
+  apiFetch("/api/auth/me").then(({ ok, data }) => {
+    if (ok && data.logged_in) {
+      localStorage.setItem("user", JSON.stringify(data.user));
     }
-  }
-
-  // Escape HTML to prevent XSS
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  // User item click for chat
-  const userItems = document.querySelectorAll(".user-item");
-  userItems.forEach((item) => {
-    item.addEventListener("click", () => {
-      userItems.forEach((u) => u.classList.remove("active"));
-      item.classList.add("active");
-
-      const userName = item.querySelector(".user-name").textContent;
-      console.log("Selected user:", userName);
-    });
-  });
-
-  // Integration buttons
-  const integrationBtns = document.querySelectorAll(".integration-card .btn");
-  integrationBtns.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.preventDefault();
-      const card = btn.closest(".integration-card");
-      const platform = card.querySelector("h4").textContent;
-      showNotification(`${platform} connection initiated!`);
-    });
-  });
-
-  // Dashboard section filtering
-  const navItemsLink = document.querySelectorAll(".nav-item[data-section]");
-  navItemsLink.forEach((item) => {
-    item.addEventListener("click", (e) => {
-      e.preventDefault();
-      const section = item.getAttribute("data-section");
-      filterGamesBySection(section);
-    });
-  });
-
-  function filterGamesBySection(section) {
-    const gameCards = document.querySelectorAll(".game-card");
-
-    if (section === "all") {
-      gameCards.forEach((card) => {
-        card.style.display = "block";
-      });
-    } else {
-      // Implement filtering logic based on section
-      gameCards.forEach((card) => {
-        card.style.display = "block";
-      });
-      showNotification(`Showing ${section} games`);
-    }
-  }
+  }).catch(() => {});
 });
 
-// Prevent form submission on Enter in text fields (except textarea)
+// Prevent accidental Enter-submit in text inputs outside chat
 document.addEventListener("keydown", (e) => {
-  if (
-    e.key === "Enter" &&
-    e.target.tagName === "INPUT" &&
-    e.target.type !== "textarea"
-  ) {
-    if (!e.target.closest(".chat-input-area")) {
-      e.preventDefault();
-    }
+  if (e.key === "Enter" && e.target.tagName === "INPUT" && e.target.type !== "textarea") {
+    if (!e.target.closest(".chat-input-area")) e.preventDefault();
   }
 });
 
-// Add active state to nav items on page load
-window.addEventListener("load", () => {
-  const firstNavItem = document.querySelector(".nav-item");
-  if (firstNavItem) {
-    firstNavItem.classList.add("active");
-  }
-});
-
-// Handle browser back button
-window.addEventListener("popstate", () => {
-  const currentScreen = document.querySelector(".screen.active");
-  if (currentScreen) {
-    console.log("Current page:", currentScreen.id);
-  }
-});
-
-// Add smooth loading effects
 window.addEventListener("load", () => {
   document.body.style.opacity = "1";
+  const firstNavItem = document.querySelector(".nav-item");
+  if (firstNavItem) firstNavItem.classList.add("active");
+  console.log("🎮 GameHaton Platform Initialized");
 });
 
-// ============================================
-// DEBUG & INITIALIZATION
-// ============================================
-
-// Log system info on page load
-window.addEventListener("load", () => {
-  console.log("🎮 LetsPlay Platform Initialized");
-  console.log("================================");
-
-  // Check if all screens exist
-  const screenIds = [
-    "landing",
-    "login",
-    "signup",
-    "dashboard",
-    "chat",
-    "profile",
-    "createGameModal",
-  ];
-  screenIds.forEach((id) => {
-    const element = document.getElementById(id);
-    console.log(
-      `${element ? "✓" : "✗"} Screen: ${id}`,
-      element ? "found" : "MISSING",
-    );
-  });
-
-  // Check localStorage
-  const user = localStorage.getItem("user");
-  if (user) {
-    console.log("✓ User data found in localStorage:", JSON.parse(user));
-  } else {
-    console.log("- No user logged in");
-  }
-
-  // Test functions
-  console.log("================================");
-  console.log("Available functions (window.GameHatonApp):");
-  console.log("- navigateTo(screenId)");
-  console.log("- handleLogin(event)");
-  console.log("- handleSignup(event)");
-  console.log("- showNotification(message)");
-  console.log("================================");
-});
-
-// Add test data function for development
-window.testLogin = function () {
-  document.getElementById("login-email").value = "test@example.com";
-  document.getElementById("login-password").value = "password123";
-  const form = document.querySelector("#login .auth-form");
-  form.dispatchEvent(new Event("submit"));
-};
-
-window.testSignup = function () {
-  document.getElementById("signup-nick").value = "TestGamer123";
-  document.getElementById("signup-email").value = "test@gamehaton.com";
-  document.getElementById("signup-password").value = "TestPass123";
-  document.getElementById("signup-confirm").value = "TestPass123";
-  document.getElementById("signup-age").value = "21";
-  document.getElementById("signup-lang").value = "en";
-  const form = document.querySelector("#signup .auth-form");
-  form.dispatchEvent(new Event("submit"));
-};
-
-console.log("💡 For testing, use: window.testLogin() or window.testSignup()");
-
-// Export functions for debugging
+// Expose for debugging
 window.GameHatonApp = {
-  navigateTo,
-  openCreateGameModal,
-  closeCreateGameModal,
-  toggleDashboardSidebar,
-  joinTeam,
-  openTeamChat,
-  showNotification,
-  handleLogin,
-  handleSignup,
-  handleCreateGame,
-  handleProfileSave,
+  navigateTo, openCreateGameModal, closeCreateGameModal, toggleDashboardSidebar,
+  joinTeam, openTeamChat, showNotification, handleLogin, handleSignup,
+  handleCreateGame, handleProfileSave, handleLogout, loadRooms,
 };

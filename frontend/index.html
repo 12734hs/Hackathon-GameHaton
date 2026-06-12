@@ -348,7 +348,7 @@
             <button class="btn btn-small" onclick="navigateTo('profile')">
               <i class="fas fa-user"></i> Profile
             </button>
-            <button class="btn btn-small" onclick="navigateTo('landing')">
+            <button class="btn btn-small" onclick="handleLogout()">
               <i class="fas fa-sign-out-alt"></i> Logout
             </button>
           </div>
@@ -498,22 +498,40 @@
               />
             </div>
             <div class="form-group">
-              <label for="game-date">Date & Time</label>
-              <input type="datetime-local" id="game-date" required />
+              <label for="game-lang">Language</label>
+              <select id="game-lang" required>
+                <option value="">Select Language</option>
+                <option value="English">English</option>
+                <option value="Azerbaijani">Azerbaijani</option>
+                <option value="Spanish">Spanish</option>
+                <option value="French">French</option>
+                <option value="Russian">Russian</option>
+              </select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label for="game-type">Activity Type</label>
-              <select id="game-type" required>
-                <option value="">Select Type</option>
-                <option value="casual">Casual</option>
-                <option value="competitive">Competitive</option>
-                <option value="tournament">Tournament</option>
-              </select>
+              <label for="game-start-date">Start Date</label>
+              <input type="date" id="game-start-date" required />
             </div>
             <div class="form-group">
-              <label for="player-amount">Players Needed</label>
+              <label for="game-start-time">Start Time</label>
+              <input type="time" id="game-start-time" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-end-date">End Date</label>
+              <input type="date" id="game-end-date" required />
+            </div>
+            <div class="form-group">
+              <label for="game-end-time">End Time</label>
+              <input type="time" id="game-end-time" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="player-amount">Max Players</label>
               <input
                 type="number"
                 id="player-amount"
@@ -523,6 +541,17 @@
                 required
               />
             </div>
+            <div class="form-group">
+              <label for="game-min-age">Min Age</label>
+              <input type="number" id="game-min-age" placeholder="0" min="0" max="120" value="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="game-max-age">Max Age</label>
+              <input type="number" id="game-max-age" placeholder="99" min="0" max="120" value="99" />
+            </div>
+            <div class="form-group"></div>
           </div>
           <div class="form-group">
             <label for="game-desc">Description</label>
