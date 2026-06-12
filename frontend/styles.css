@@ -539,27 +539,32 @@ a:hover {
    ============================================ */
 
 .dashboard-wrapper {
-  display: grid;
-  grid-template-columns: 240px 1fr;
+  display: flex;
   width: 100%;
-  max-width: none;
+}
+
+.sidebar {
+  flex: 0 0 240px;
 }
 
 .dashboard-main {
-  width: 100%;
+  flex: 1;
+  width: calc(100% - 240px);
   max-width: none;
   padding: 40px 48px;
+  overflow-x: hidden;
 }
 
 .games-feed {
   width: 100%;
-  max-width: none;
+  max-width: 100%;
 }
 
 .game-card {
   width: 100%;
   max-width: none;
 }
+
 
 .sidebar {
   width: 280px;
