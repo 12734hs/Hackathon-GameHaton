@@ -43,6 +43,8 @@ class Room(db.Model):
     min_age = db.Column(db.Integer, default=0)
     max_age = db.Column(db.Integer, default=99)
     max_players = db.Column(db.Integer, default=5)
+    game_start_time = db.Column(db.DateTime, nullable=False)
+    game_end_time = db.Column(db.DateTime, nullable=False)
 
 class Message(db.Model):
     __tablename__ = 'messages'
